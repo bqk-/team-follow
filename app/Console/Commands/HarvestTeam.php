@@ -67,6 +67,7 @@ class HarvestTeam extends Command
             ]);
         $team = json_decode($request->getBody());
         $t = new \App\database\Team();
+        echo 'Registered ' . $team->name . '\n';
         $t->id = $team->id;
         $t->name = $team->name;
         $t->code = $team->code;

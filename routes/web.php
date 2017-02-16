@@ -19,5 +19,6 @@ $app->get('/', function () use ($app) {
 });
 
 $app->get('/teams/', function () use ($app) {
-    return "List teams";
+    $teams = App\database\Team::all();
+    return json_encode($teams);
 });
