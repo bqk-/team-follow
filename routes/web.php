@@ -15,7 +15,7 @@ $app->get('/', function () use ($app) {
     return json_encode([
         "name" => "Team API",
         "version" => "0.1",
-        "teams" => env('APP_URL') + "/teams"
+        "teams" => env('APP_URL') . "/teams"
     ]);
 });
 
