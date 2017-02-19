@@ -65,10 +65,14 @@ class HarvestTeam extends Command
                     'X-Auth-Token'=> env('APIKEY')
                 ]
             ]);
+        
         $team = json_decode($request->getBody());
         $t = new \App\database\Team();
         echo 'Registered ' . $team->name . '\n';
-        $t->id = $team->id;
+        
+        $id = substr($href, strrpos($href, '/'), strlen($href) - 1);
+        
+        $t->id = $id;
         $t->name = $team->name;
         $t->code = $team->code;
         $t->logo = $team->crestUrl;

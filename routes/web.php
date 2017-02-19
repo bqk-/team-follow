@@ -14,11 +14,19 @@
 $app->get('/', function () use ($app) {
     return json_encode([
         "name" => "Team API",
-        "version" => "0.1"
+        "version" => "0.1",
+        "teams" => URL::to('/') + "teams"
     ]);
 });
 
-$app->get('/teams/', function () use ($app) {
-    $teams = App\database\Team::all();
-    return json_encode($teams);
-});
+$app->get('/teams/{page?}', function ($page = 0) use ($app) {
+    $teams = App\database\Team::skip(0 * $page)->take(20);
+    $ret = array();
+    foreach ($teams as $t)
+    {
+        $ret[] = new App\Http\Models\Team($t->id, $t->name, $t->code, $t->logo);
+    }
+  
+    return json_encode($ret);
+})
+->where('page', '[0-9]+');
