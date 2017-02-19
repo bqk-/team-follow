@@ -27,28 +27,35 @@ class HarvestTeam extends Command
      */
     public function handle()
     {
-        $client = new \GuzzleHttp\Client();
-        $request = $client->get('http://api.football-data.org/v1/fixtures?timeFrame=n1',
-                [
-                'headers' => [
-                    'User-Agent'  => 'testing/1.0',
-                    'Accept'      => 'application/json',
-                    'X-Auth-Token'=> env('APIKEY')
-                ]
-            ]);
-        $response = json_decode($request->getBody());
-        
-        foreach ($response->fixtures as $f)
+        try
         {
-            if(!$this->existsTeam($f->_links->homeTeam->href))
-            {
-                $this->registerTeam($f->_links->homeTeam->href);
-            }
+            $client = new \GuzzleHttp\Client();
+            $request = $client->get('http://api.football-data.org/v1/fixtures?timeFrame=n1',
+                    [
+                    'headers' => [
+                        'User-Agent'  => 'testing/1.0',
+                        'Accept'      => 'application/json',
+                        'X-Auth-Token'=> env('APIKEY')
+                    ]
+                ]);
+            $response = json_decode($request->getBody());
 
-            if(!$this->existsTeam($f->_links->awayTeam->href))
+            foreach ($response->fixtures as $f)
             {
-                $this->registerTeam($f->_links->awayTeam->href);
-            }            
+                if(!$this->existsTeam($f->_links->homeTeam->href))
+                {
+                    $this->registerTeam($f->_links->homeTeam->href);
+                }
+
+                if(!$this->existsTeam($f->_links->awayTeam->href))
+                {
+                    $this->registerTeam($f->_links->awayTeam->href);
+                }            
+            }
+        }
+        catch (\GuzzleHttp\Exception\ClientException $e) {
+            sleep(60);
+            $this->handle();
         }
     }
     
@@ -73,7 +80,7 @@ class HarvestTeam extends Command
         
         $team = json_decode($request->getBody());
         $t = new \App\database\Team();
-        echo 'Registered ' . $team->name . '\n';
+        echo 'Registered ' . $team->name .  PHP_EOL;
         
         $id = substr($href, strrpos($href, '/') + 1, strlen($href) - 1);
         
