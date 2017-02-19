@@ -9,5 +9,5 @@ namespace App\database;
 
 class Fixture extends \Illuminate\Database\Eloquent\Model
 {
-
+    public $timestamps = false;
 }

@@ -9,5 +9,5 @@ namespace App\database;
 
 class Team extends \Illuminate\Database\Eloquent\Model
 {
-
+    public $timestamps = false;
 }

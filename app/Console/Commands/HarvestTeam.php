@@ -49,7 +49,7 @@ class HarvestTeam extends Command
     
     private function existsTeam($href)
     {
-        $id = substr($href, strrpos($href, '/'), strlen($href) - 1);
+        $id = substr($href, strrpos($href, '/') + 1, strlen($href) - 1);
         $t = \App\database\Team::find($id);
         return $t != null;
     }
@@ -70,7 +70,7 @@ class HarvestTeam extends Command
         $t = new \App\database\Team();
         echo 'Registered ' . $team->name . '\n';
         
-        $id = substr($href, strrpos($href, '/'), strlen($href) - 1);
+        $id = substr($href, strrpos($href, '/') + 1, strlen($href) - 1);
         
         $t->id = $id;
         $t->name = $team->name;
