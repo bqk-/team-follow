@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class NullableCode extends Migration
+class NullableLogo extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class NullableCode extends Migration
     public function up()
     {
         Schema::table('teams', function (Blueprint $table) {
-            $table->string('code', 10)->nullable()->change();
+            $table->string('logo', 255)->nullable()->change();
         });
     }
 
@@ -26,7 +26,7 @@ class NullableCode extends Migration
     public function down()
     {
         Schema::table('teams', function (Blueprint $table) {
-            $table->string('code', 10)->change();
+            $table->string('logo', 255)->change();
         });
     }
 }
