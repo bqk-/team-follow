@@ -19,7 +19,7 @@ $app->get('/', function () use ($app) {
     ]);
 });
 
-$app->get('/teams/{page?}', function ($page = 0) use ($app) {
+$app->get('/teams/{page:[0-9]+}', function ($page = 0) use ($app) {
     $teams = App\database\Team::skip(0 * $page)->take(20);
     $ret = array();
     foreach ($teams as $t)
@@ -28,5 +28,4 @@ $app->get('/teams/{page?}', function ($page = 0) use ($app) {
     }
   
     return json_encode($ret);
-})
-->where('page', '[0-9]+');
+});
