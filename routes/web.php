@@ -23,7 +23,7 @@ $app->get('/', function () use ($app) {
 
 $app->get('/teams/{page:[0-9]+}', function ($page = 0) use ($app) {
     $count = App\database\Team::count();
-    $teams = App\database\Team::skip(0 * $page)->take(20);
+    $teams = App\database\Team::skip($page * PAGESIZE)->take(PAGESIZE)->get();
     $ret = array();
     foreach ($teams as $t)
     {

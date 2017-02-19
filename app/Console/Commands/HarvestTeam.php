@@ -11,7 +11,7 @@ class HarvestTeam extends Command
      *
      * @var string
      */
-    protected $signature = 'harvest_team';
+    protected $signature = 'harvest:team';
 
     /**
      * The console command description.
@@ -30,7 +30,7 @@ class HarvestTeam extends Command
         try
         {
             $client = new \GuzzleHttp\Client();
-            $request = $client->get('http://api.football-data.org/v1/fixtures?timeFrame=n1',
+            $request = $client->get('http://api.football-data.org/v1/fixtures?timeFrame=n60',
                     [
                     'headers' => [
                         'User-Agent'  => 'testing/1.0',
@@ -54,7 +54,7 @@ class HarvestTeam extends Command
             }
         }
         catch (\GuzzleHttp\Exception\ClientException $e) {
-            sleep(60);
+            sleep(65);
             $this->handle();
         }
     }
