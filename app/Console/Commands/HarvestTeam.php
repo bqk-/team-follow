@@ -43,6 +43,11 @@ class HarvestTeam extends Command
             if(!$this->existsTeam($f->_links->homeTeam->href))
             {
                 $this->registerTeam($f->_links->homeTeam->href);
+            }
+
+            if(!$this->existsTeam($f->_links->awayTeam->href))
+            {
+                $this->registerTeam($f->_links->awayTeam->href);
             }            
         }
     }
