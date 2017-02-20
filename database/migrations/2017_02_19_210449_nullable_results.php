@@ -13,7 +13,7 @@ class NullableResults extends Migration
      */
     public function up()
     {
-        Schema::table('teams', function (Blueprint $table) {
+        Schema::table('fixtures', function (Blueprint $table) {
             $table->integer('homeGoals')->nullable()->change();
             $table->integer('awayGoals')->nullable()->change();
             $table->integer('extraTimeHomeGoals')->nullable()->change();
@@ -30,7 +30,7 @@ class NullableResults extends Migration
      */
     public function down()
     {
-        Schema::table('teams', function (Blueprint $table) {
+        Schema::table('fixtures', function (Blueprint $table) {
             $table->integer('homeGoals')->default(0)->change();
             $table->integer('awayGoals')->default(0)->change();
             $table->integer('extraTimeHomeGoals')->default(0)->change();
