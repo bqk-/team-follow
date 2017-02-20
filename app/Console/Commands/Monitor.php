@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 
-class HarvestFixture extends Command
+class Monitor extends Command
 {
     /**
      * The name and signature of the console command.

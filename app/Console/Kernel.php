@@ -13,7 +13,9 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-            Commands\HarvestTeam::class
+        Commands\HarvestTeam::class,
+        Commands\HarvestFixture::class,
+        Commands\Monitor::class,
     ];
 
     /**
