@@ -60,7 +60,7 @@ $app->get('/teams/search/{search:[a-zA-Z0-9]+}', function ($search = "") use ($a
   
     return response()->json(new \App\Http\Models\TeamList($ret,
             new \App\Http\Models\Links(
-                    env('APP_URL') . "/teams/" . $page,
+                    env('APP_URL') . "/teams/search/" . $search,
                     "null",
                     "null"
                     )
