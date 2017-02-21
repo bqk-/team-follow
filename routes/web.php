@@ -38,3 +38,31 @@ $app->get('/teams/{page:[0-9]+}', function ($page = 0) use ($app) {
                     )
             ));
 });
+
+$app->get('/teams/search/{search:[a-zA-Z0-9]+}', function ($search = "") use ($app) {
+    if($search == null)
+    {
+        return response()->json(new \App\Http\Models\TeamList(array(),
+            new \App\Http\Models\Links(
+                    env('APP_URL') . "/teams/search/" . $search,
+                    "null",
+                    "null"
+                    )
+            ));
+    }
+    
+    $teams = App\database\Team::where('name', 'LIKE', '%' . $search . '%')->get();
+    $ret = array();
+    foreach ($teams as $t)
+    {
+        $ret[] = new App\Http\Models\Team($t->id, $t->name, $t->code, $t->logo);
+    }
+  
+    return response()->json(new \App\Http\Models\TeamList($ret,
+            new \App\Http\Models\Links(
+                    env('APP_URL') . "/teams/" . $page,
+                    "null",
+                    "null"
+                    )
+            ));
+});
