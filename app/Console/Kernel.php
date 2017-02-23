@@ -26,6 +26,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        //
+       $schedule->command('harvest:team')->dailyAt('02:00');
+       $schedule->command('harvest:fixture')->dailyAt('03:00');
+       $schedule->command('harvest:monitor')->everyMinute();
     }
 }

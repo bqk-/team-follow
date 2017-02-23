@@ -51,7 +51,8 @@ $app->get('/teams/search/{search:[a-zA-Z0-9]+}', function ($search = "") use ($a
             ));
     }
     
-    $teams = App\database\Team::where('name', 'LIKE', '%' . $search . '%')->get();
+    $teams = App\database\Team::where('name', 'LIKE', '%' . $search . '%')
+            ->orderBy('name', 'desc')->get();
     $ret = array();
     foreach ($teams as $t)
     {
@@ -61,6 +62,96 @@ $app->get('/teams/search/{search:[a-zA-Z0-9]+}', function ($search = "") use ($a
     return response()->json(new \App\Http\Models\TeamList($ret,
             new \App\Http\Models\Links(
                     env('APP_URL') . "/teams/search/" . $search,
+                    "null",
+                    "null"
+                    )
+            ));
+});
+
+$app->get('/teams/{id:[0-9]+}', function ($id = "") use ($app) {
+    if($id == null)
+    {
+        return response()->json(new \App\Http\Models\TeamList(array(),
+            new \App\Http\Models\Links(
+                    env('APP_URL') . "/teams/" . $id,
+                    "null",
+                    "null"
+                    )
+            ));
+    }
+    
+    $team = App\database\Team::find($id);
+    if($team == null)
+    {
+        return response()->json(null);
+    }
+    
+    $before = date('Y-m-d', time() - 7 * 3600);
+    $after = date('Y-m-d', time() + 14 * 3600);
+    
+    $fixtures = App\database\Fixture::whereDate('date', '<', $after)
+            ->whereDate('date', '>', $before)
+            ->where(function ($query) {
+                $query->where('homeTeamId', $id)
+                    ->orWhere('awayTeamId', $id);
+            })->get();
+    $ret = array();
+    $past = array();
+    $cacheTeams = array();
+    $cacheTeams[$team->id] = $team;
+    foreach ($fixtures as $f)
+    {
+        if(!isset($cacheTeams[$f->homeTeamId]))
+        {
+            $t = App\database\Team::find($f->homeTeamId);
+            if($t == null)
+            {
+                continue;
+            }
+            
+            $cacheTeams[$t->id] = $t;
+        }
+        
+        if(!isset($cacheTeams[$f->awayTeamId]))
+        {
+            $t = App\database\Team::find($f->awayTeamId);
+            if($t == null)
+            {
+                continue;
+            }
+            
+            $cacheTeams[$t->id] = $t;
+        }
+        
+        $home = $cacheTeams[$f->homeTeamId];
+        $away = $cacheTeams[$f->awayTeamId];
+        
+        $fixture = new App\Http\Models\Game($f->id, $f->date,
+                new \App\Http\Models\Team($home->id, $home->name, $home->code, $home->logo),
+                new \App\Http\Models\Team($away->id, $away->name, $away->code, $away->logo),
+                $f->status,
+                $f->competitionId,
+                $f->homeGoals,
+                $f->awayGoals,
+                $f->extraTimeHomeGoals,
+                $f->extraTimeAwayGoals,
+                $f->penaltiesHome,
+                $f->penaltiesAway);
+        
+        if(strtotime($fixture->date) >= time())
+        {
+            $ret[] = $fixture;
+        }
+        else
+        {
+            $past[] = $fixture;
+        }
+    }
+  
+    return response()->json(new \App\Http\Models\TeamDetails($team->id, $team->name, 
+            $team->code, $team->logo, $ret, $past,
+            new \App\Http\Models\Links(
+                    env('APP_URL') . "/teams/" . $id,
                     "null",
                     "null"
                     )
