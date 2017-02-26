@@ -122,7 +122,7 @@ $app->post('/manage/monitor/new/{user:[0-9]+}/{id:[0-9]+}', function ($user, $id
     return response()->json(true);
 });
 
-$app->get('/teams/{id:[0-9]+}', function ($id) use ($app) {
+$app->get('/team/{id:[0-9]+}', function ($id) use ($app) {
     if($id == null)
     {
         return response()->json(null);
