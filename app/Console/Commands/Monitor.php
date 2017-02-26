@@ -47,7 +47,7 @@ class Monitor extends Command
                     ]);
                 $response = json_decode($request->getBody());
                 $f = $response->fixture;
-                if(isset($f->result))
+                if(isset($f->result) && $this->hasChanged($t, $f))
                 {
                     $t->homeGoals = $f->result->goalsHomeTeam;
                     $t->awayGoals = $f->result->goalsAwayTeam;
@@ -62,13 +62,34 @@ class Monitor extends Command
                         $t->penaltiesHome = $f->result->penaltyShootout->goalsHomeTeam;
                         $t->penaltiesAway = $f->result->penaltyShootout->goalsAwayTeam;
                     }
+                    
+                    echo 'Score update: ' . print_r($f->result) .  PHP_EOL;
+                    $t->save();
                 }
-                $t->save();
             }
         }
         catch (\GuzzleHttp\Exception\ClientException $e) {
             sleep(60);
             $this->handle();
         }
+    }
+    
+    private function hasChanged(Fixture $t, $json)
+    {
+        $equals = $t->homeGoals == $json->result->goalsHomeTeam
+        && $t->awayGoals == $json->result->goalsAwayTeam;
+        if(isset($json->result->extraTime))
+        {
+            $equals &= $t->extraTimeHomeGoals == $json->result->extraTime->goalsHomeTeam
+            && $t->extraTimeAwayGoals == $json->result->extraTime->goalsAwayTeam;
+        }
+
+        if(isset($json->result->penaltyShootout))
+        {
+            $equals &= $t->penaltiesHome == $json->result->penaltyShootout->goalsHomeTeam
+            && $t->penaltiesAway = $json->result->penaltyShootout->goalsAwayTeam;
+        }
+        
+        return !$equals;
     }
 }

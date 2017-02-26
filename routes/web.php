@@ -111,7 +111,7 @@ $app->post('/manage/monitors/new/{user:[0-9]+}/{id:[0-9]+}', function ($user, $i
     $monitor = App\Database\Monitor::where('teamId', '=', $id)
         ->where('userId', $user->id)
         ->get();
-    if($monitor != null)
+    if($monitor->count() > 0)
     {
         return response()->json(false);
     }
