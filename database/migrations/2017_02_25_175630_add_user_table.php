@@ -15,17 +15,16 @@ class AddUserTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id')->unique();
-            $table->primary('id');
             $table->string('fb_id');
             $table->integer('date');
         });
         
         Schema::table('teams', function (Blueprint $table) {
-            $table->integer('id')->unique()->primary();
+            $table->integer('id')->unique()->change();
         });
         
         Schema::table('fixtures', function (Blueprint $table) {
-            $table->integer('id')->unique()->primary();
+            $table->integer('id')->unique()->change();
         });
         
     }
@@ -40,11 +39,11 @@ class AddUserTable extends Migration
         Schema::dropIfExists('users');
         
         Schema::table('teams', function (Blueprint $table) {
-            $table->integer('id');
+            $table->integer('id')->change();
         });
         
         Schema::table('fixtures', function (Blueprint $table) {
-            $table->integer('id');
+            $table->integer('id')->change();
         });
     }
 }
