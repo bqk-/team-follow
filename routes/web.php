@@ -96,16 +96,16 @@ $app->post('/manage/monitors/new/{user:[0-9]+}/{id:[0-9]+}', function ($user, $i
         return response()->json(false);
     }
     
-    $user = App\Database\User::where('fb_id', $id)->first();
+    $user = App\Database\User::where('fb_id', $user)->first();
     if($user == null)
     {
-        return response()->json(1);
+        return response()->json(false);
     }
     
     $team = App\Database\Team::find($id);
     if($team == null)
     {
-        return response()->json(2);
+        return response()->json(false);
     }
     
     $monitor = App\Database\Monitor::where('teamId', '=', $id)
@@ -113,7 +113,7 @@ $app->post('/manage/monitors/new/{user:[0-9]+}/{id:[0-9]+}', function ($user, $i
         ->get();
     if($monitor != null)
     {
-        return response()->json(3);
+        return response()->json(false);
     }
     
     $monitor = new App\Database\Monitor;
