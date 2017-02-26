@@ -141,7 +141,7 @@ $app->get('/team/{id:[0-9]+}', function ($id) use ($app) {
     
     $fixtures = App\database\Fixture::whereDate('date', '<', $after)
             ->whereDate('date', '>', $before)
-            ->where(function ($query) {
+            ->where(function ($query) use ($id) {
                 $query->where('homeTeamId', $id)
                     ->orWhere('awayTeamId', $id);
             })->get();
