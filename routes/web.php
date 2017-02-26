@@ -210,3 +210,41 @@ $app->get('/team/{id:[0-9]+}', function ($id) use ($app) {
                     )
             ));
 });
+
+
+$app->get('/monitors/{userId:[0-9]+}', function($userId) use ($app){
+    if($userId == -1) 
+    {
+        $monitors = App\database\Monitor::all();
+    }
+    else
+    {
+        $user = App\database\User::where('fb_id', $userId)->first();
+        if($user == null)
+        {
+            return response()->json(new \App\Http\Models\MonitorList(array(),
+                    new App\Http\Models\Links(
+                            env('APP_URL') . "/monitors/" . $userId,
+                            "null",
+                            "null"
+                            )));
+        }
+
+        $monitors = App\database\Monitor::where('userId', $user->id)->get();
+    }
+    
+    $ret = array();
+    foreach ($monitors as $m)
+    {
+        $t = App\database\Team::find($m->teamId);
+        $ret[] = new \App\Http\Models\Monitor($m->id, new App\Http\Models\Team($t->id, $t->name, $t->code, $t->logo,
+                env('APP_URL') . "/team/" . $t->id));
+    }
+    
+    return response()->json(new \App\Http\Models\MonitorList($ret,
+                new App\Http\Models\Links(
+                        env('APP_URL') . "/monitors/" . $userId,
+                        "null",
+                        "null"
+                        )));
+});
