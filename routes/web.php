@@ -22,8 +22,8 @@ $app->get('/', function () use ($app) {
 });
 
 $app->get('/teams/{page:[0-9]+}', function ($page = 0) use ($app) {
-    $count = App\database\Team::count();
-    $teams = App\database\Team::skip($page * PAGESIZE)->take(PAGESIZE)->get();
+    $count = App\Database\Team::count();
+    $teams = App\Database\Team::skip($page * PAGESIZE)->take(PAGESIZE)->get();
     $ret = array();
     foreach ($teams as $t)
     {
@@ -52,7 +52,7 @@ $app->get('/teams/search/{search:[a-zA-Z0-9]+}', function ($search = "") use ($a
             ));
     }
     
-    $teams = App\database\Team::where('name', 'LIKE', '%' . $search . '%')
+    $teams = App\Database\Team::where('name', 'LIKE', '%' . $search . '%')
             ->orderBy('name', 'desc')->get();
     $ret = array();
     foreach ($teams as $t)
@@ -70,53 +70,53 @@ $app->get('/teams/search/{search:[a-zA-Z0-9]+}', function ($search = "") use ($a
             ));
 });
 
-$app->post('/manage/account/new/{id:[0-9]+}', function ($id) use ($app) {
+$app->post('/manage/users/new/{id:[0-9]+}', function ($id) use ($app) {
     if($id == null)
     {
         return response()->json(false);
     }
     
-    $user = App\database\User::where('fb_id',$id)->first();
+    $user = App\Database\User::where('fb_id',$id)->first();
     if($user != null)
     {
         return response()->json(true);
     }
     
-    $user = new App\database\User;
+    $user = new App\Database\User;
     $user->fb_id = $id;
-    $user->date = new DateTime(time());
+    $user->date = date('Y-m-d H:i:s', time());
     $user->save();
     
     return response()->json(true);
 });
 
-$app->post('/manage/monitor/new/{user:[0-9]+}/{id:[0-9]+}', function ($user, $id) use ($app) {
+$app->post('/manage/monitors/new/{user:[0-9]+}/{id:[0-9]+}', function ($user, $id) use ($app) {
     if($id == null || $user == null) 
     {
         return response()->json(false);
     }
     
-    $user = App\database\User::where('fb_id',$id)->first();
+    $user = App\Database\User::where('fb_id', $id)->first();
     if($user == null)
     {
-        return response()->json(false);
+        return response()->json(1);
     }
     
-    $team = App\database\Team::find($id);
+    $team = App\Database\Team::find($id);
     if($team == null)
     {
-        return response()->json(false);
+        return response()->json(2);
     }
     
-    $monitor = App\database\Monitor::where('teamId', '=', $id)
+    $monitor = App\Database\Monitor::where('teamId', '=', $id)
         ->where('userId', $user->id)
         ->get();
     if($monitor != null)
     {
-        return response()->json(false);
+        return response()->json(3);
     }
     
-    $monitor = new App\database\Monitor;
+    $monitor = new App\Database\Monitor;
     $monitor->teamId = $team->id;
     $monitor->userId = $user->id;
     $monitor->save();
@@ -130,7 +130,7 @@ $app->get('/team/{id:[0-9]+}', function ($id) use ($app) {
         return response()->json(null);
     }
     
-    $team = App\database\Team::find($id);
+    $team = App\Database\Team::find($id);
     if($team == null)
     {
         return response()->json(null);
@@ -139,7 +139,7 @@ $app->get('/team/{id:[0-9]+}', function ($id) use ($app) {
     $before = date('Y-m-d', time() - 7 * 3600);
     $after = date('Y-m-d', time() + 14 * 3600);
     
-    $fixtures = App\database\Fixture::whereDate('date', '<', $after)
+    $fixtures = App\Database\Fixture::whereDate('date', '<', $after)
             ->whereDate('date', '>', $before)
             ->where(function ($query) use ($id) {
                 $query->where('homeTeamId', $id)
@@ -153,7 +153,7 @@ $app->get('/team/{id:[0-9]+}', function ($id) use ($app) {
     {
         if(!isset($cacheTeams[$f->homeTeamId]))
         {
-            $t = App\database\Team::find($f->homeTeamId);
+            $t = App\Database\Team::find($f->homeTeamId);
             if($t == null)
             {
                 continue;
@@ -164,7 +164,7 @@ $app->get('/team/{id:[0-9]+}', function ($id) use ($app) {
         
         if(!isset($cacheTeams[$f->awayTeamId]))
         {
-            $t = App\database\Team::find($f->awayTeamId);
+            $t = App\Database\Team::find($f->awayTeamId);
             if($t == null)
             {
                 continue;
@@ -213,13 +213,13 @@ $app->get('/team/{id:[0-9]+}', function ($id) use ($app) {
 
 
 $app->get('/monitors/{userId:[0-9]+}', function($userId) use ($app){
-    if($userId == -1) 
+    if($userId == 0) 
     {
-        $monitors = App\database\Monitor::all();
+        $monitors = \App\Database\Monitor::all();
     }
     else
     {
-        $user = App\database\User::where('fb_id', $userId)->first();
+        $user = App\Database\User::where('fb_id', $userId)->first();
         if($user == null)
         {
             return response()->json(new \App\Http\Models\MonitorList(array(),
@@ -230,13 +230,13 @@ $app->get('/monitors/{userId:[0-9]+}', function($userId) use ($app){
                             )));
         }
 
-        $monitors = App\database\Monitor::where('userId', $user->id)->get();
+        $monitors = App\Database\Monitor::where('userId', $user->id)->get();
     }
     
     $ret = array();
     foreach ($monitors as $m)
     {
-        $t = App\database\Team::find($m->teamId);
+        $t = App\Database\Team::find($m->teamId);
         $ret[] = new \App\Http\Models\Monitor($m->id, new App\Http\Models\Team($t->id, $t->name, $t->code, $t->logo,
                 env('APP_URL') . "/team/" . $t->id));
     }

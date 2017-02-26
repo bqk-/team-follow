@@ -32,7 +32,9 @@ class HarvestFixture extends Command
             $count = App\database\Monitor::count();
             for($page = 0; $page < $count / 20; $page++)
             {
-                $teams = App\database\Monitor::skip($page * 20)->take(20)->get();
+                $teams = App\database\Monitor::
+                        select('teamId')->distinct()
+                        ->skip($page * 20)->take(20)->get();
                 foreach ($teams as $t)  
                 {
                     $client = new \GuzzleHttp\Client();
