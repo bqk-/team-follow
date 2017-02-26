@@ -27,7 +27,8 @@ $app->get('/teams/{page:[0-9]+}', function ($page = 0) use ($app) {
     $ret = array();
     foreach ($teams as $t)
     {
-        $ret[] = new App\Http\Models\Team($t->id, $t->name, $t->code, $t->logo);
+        $ret[] = new App\Http\Models\Team($t->id, $t->name, $t->code, $t->logo,
+                env('APP_URL') . "/team/" + $t->id);
     }
   
     return response()->json(new \App\Http\Models\TeamList($ret,
@@ -56,7 +57,8 @@ $app->get('/teams/search/{search:[a-zA-Z0-9]+}', function ($search = "") use ($a
     $ret = array();
     foreach ($teams as $t)
     {
-        $ret[] = new App\Http\Models\Team($t->id, $t->name, $t->code, $t->logo);
+        $ret[] = new App\Http\Models\Team($t->id, $t->name, $t->code, $t->logo,
+                env('APP_URL') . "/team/" + $t->id);
     }
   
     return response()->json(new \App\Http\Models\TeamList($ret,
@@ -175,8 +177,10 @@ $app->get('/team/{id:[0-9]+}', function ($id) use ($app) {
         $away = $cacheTeams[$f->awayTeamId];
         
         $fixture = new App\Http\Models\Game($f->id, $f->date,
-                new \App\Http\Models\Team($home->id, $home->name, $home->code, $home->logo),
-                new \App\Http\Models\Team($away->id, $away->name, $away->code, $away->logo),
+                new \App\Http\Models\Team($home->id, $home->name, $home->code, $home->logo,
+                        env('APP_URL') . "/team/" + $home->id),
+                new \App\Http\Models\Team($away->id, $away->name, $away->code, $away->logo,
+                        env('APP_URL') . "/team/" + $away->id),
                 $f->status,
                 $f->competitionId,
                 $f->homeGoals,
@@ -197,9 +201,10 @@ $app->get('/team/{id:[0-9]+}', function ($id) use ($app) {
     }
   
     return response()->json(new \App\Http\Models\TeamDetails($team->id, $team->name, 
-            $team->code, $team->logo, $ret, $past,
+            $team->code, $team->logo,
+            $ret, $past,
             new \App\Http\Models\Links(
-                    env('APP_URL') . "/teams/" . $id,
+                    env('APP_URL') . "/team/" . $id,
                     "null",
                     "null"
                     )

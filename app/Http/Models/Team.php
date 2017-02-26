@@ -12,13 +12,15 @@ class Team
     public $id,
             $name,
             $code,
-            $logo;
+            $logo,
+            $link;
     
-    public function __construct($id, $name, $code, $logo)
+    public function __construct($id, $name, $code, $logo, $link)
     {
         $this->id = $id;
         $this->name = $name;
         $this->code = $code;
         $this->logo = $logo;
+        $this->link = $link;
     }
 }
