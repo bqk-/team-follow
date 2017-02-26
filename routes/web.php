@@ -68,16 +68,64 @@ $app->get('/teams/search/{search:[a-zA-Z0-9]+}', function ($search = "") use ($a
             ));
 });
 
-$app->get('/teams/{id:[0-9]+}', function ($id = "") use ($app) {
+$app->post('/manage/account/new/{id:[0-9]+}', function ($id) use ($app) {
     if($id == null)
     {
-        return response()->json(new \App\Http\Models\TeamList(array(),
-            new \App\Http\Models\Links(
-                    env('APP_URL') . "/teams/" . $id,
-                    "null",
-                    "null"
-                    )
-            ));
+        return response()->json(false);
+    }
+    
+    $user = App\database\User::where('fb_id',$id)->first();
+    if($user != null)
+    {
+        return response()->json(true);
+    }
+    
+    $user = new App\database\User;
+    $user->fb_id = $id;
+    $user->date = new DateTime(time());
+    $user->save();
+    
+    return response()->json(true);
+});
+
+$app->post('/manage/monitor/new/{user:[0-9]+}/{id:[0-9]+}', function ($user, $id) use ($app) {
+    if($id == null || $user == null) 
+    {
+        return response()->json(false);
+    }
+    
+    $user = App\database\User::where('fb_id',$id)->first();
+    if($user == null)
+    {
+        return response()->json(false);
+    }
+    
+    $team = App\database\Team::find($id);
+    if($team == null)
+    {
+        return response()->json(false);
+    }
+    
+    $monitor = App\database\Monitor::where('teamId', '=', $id)
+        ->where('userId', $user->id)
+        ->get();
+    if($monitor != null)
+    {
+        return response()->json(false);
+    }
+    
+    $monitor = new App\database\Monitor;
+    $monitor->teamId = $team->id;
+    $monitor->userId = $user->id;
+    $monitor->save();
+    
+    return response()->json(true);
+});
+
+$app->get('/teams/{id:[0-9]+}', function ($id) use ($app) {
+    if($id == null)
+    {
+        return response()->json(null);
     }
     
     $team = App\database\Team::find($id);
