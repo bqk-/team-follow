@@ -31,7 +31,7 @@ class Monitor extends Command
         {
             date_default_timezone_set("UTC"); 
             $now = time();
-            $fixtures = App\database\Fixture::whereDate('date', '>=', date('Y-m-d\TH:i', $now))
+            $fixtures = App\Database\Fixture::whereDate('date', '>=', date('Y-m-d\TH:i', $now))
                     ->whereDate('date', '<=', date('Y-m-d\TH:i', $now + 10800));
             foreach ($fixtures as $t)  
             {

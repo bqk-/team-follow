@@ -62,7 +62,7 @@ class HarvestTeam extends Command
     private function existsTeam($href)
     {
         $id = substr($href, strrpos($href, '/') + 1, strlen($href) - 1);
-        $t = \App\database\Team::find($id);
+        $t = \App\Database\Team::find($id);
         return $t != null;
     }
     
@@ -79,7 +79,7 @@ class HarvestTeam extends Command
             ]);
         
         $team = json_decode($request->getBody());
-        $t = new \App\database\Team();
+        $t = new \App\Database\Team();
         echo 'Registered ' . $team->name .  PHP_EOL;
         
         $id = substr($href, strrpos($href, '/') + 1, strlen($href) - 1);

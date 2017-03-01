@@ -29,10 +29,10 @@ class HarvestFixture extends Command
     {
         try
         {
-            $count = App\database\Monitor::count();
+            $count = \App\Database\Monitor::count();
             for($page = 0; $page < $count / 20; $page++)
             {
-                $teams = App\database\Monitor::
+                $teams = \App\Database\Monitor::
                         select('teamId')->distinct()
                         ->skip($page * 20)->take(20)->get();
                 foreach ($teams as $t)  
@@ -82,7 +82,7 @@ class HarvestFixture extends Command
         $href = $f->_links->self->href;
         $id = substr($href, strrpos($href, '/') + 1, strlen($href) - 1);
         
-        $t = new \App\database\Fixture();
+        $t = new \App\Database\Fixture();
         $t->id = $id;
         $this->updateFixture($f, $t);
     }
