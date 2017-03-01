@@ -71,7 +71,7 @@ class HarvestFixture extends Command
     private function existsFixture($href)
     {
         $id = substr($href, strrpos($href, '/') + 1, strlen($href) - 1);
-        $t = \App\database\Fixture::find($id);
+        $t = \App\Database\Fixture::find($id);
         return $t != null;
     }
     
