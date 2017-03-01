@@ -110,8 +110,8 @@ $app->post('/manage/monitors/new/{user:[0-9]+}/{id:[0-9]+}', function ($user, $i
     
     $monitor = App\Database\Monitor::where('teamId', '=', $id)
         ->where('userId', $user->id)
-        ->get();
-    if($monitor->count() > 0)
+        ->first();
+    if($monitor != null)
     {
         return response()->json(false);
     }
@@ -120,6 +120,37 @@ $app->post('/manage/monitors/new/{user:[0-9]+}/{id:[0-9]+}', function ($user, $i
     $monitor->teamId = $team->id;
     $monitor->userId = $user->id;
     $monitor->save();
+    
+    return response()->json(true);
+});
+
+$app->delete('manage/monitors/delete/{user:[0-9]+}/{id:[0-9]+}', function($user, $id) use ($app){
+    if($id == null || $user == null) 
+    {
+        return response()->json(false);
+    }
+    
+    $user = App\Database\User::where('fb_id', $user)->first();
+    if($user == null)
+    {
+        return response()->json(false);
+    }
+    
+    $team = App\Database\Team::find($id);
+    if($team == null)
+    {
+        return response()->json(false);
+    }
+    
+    $monitor = App\Database\Monitor::where('teamId', '=', $id)
+        ->where('userId', $user->id)
+        ->first();
+    if($monitor == null)
+    {
+        return response()->json(false);
+    }
+    
+    $monitor->delete();
     
     return response()->json(true);
 });
@@ -136,17 +167,17 @@ $app->get('/team/{id:[0-9]+}', function ($id) use ($app) {
         return response()->json(null);
     }
     
-    $before = date('Y-m-d', time() - 7 * 3600);
-    $after = date('Y-m-d', time() + 14 * 3600);
+    $before = date('Y-m-d', time() - (30 * 3600 * 24));
+    $after = date('Y-m-d', time() + (60 * 3600 * 24));
     
-    $fixtures = App\Database\Fixture::whereDate('date', '<', $after)
-            ->whereDate('date', '>', $before)
+    $fixtures = App\Database\Fixture::where('date', '>', $before)
+            ->where('date', '<', $after)
             ->where(function ($query) use ($id) {
                 $query->where('homeTeamId', $id)
                     ->orWhere('awayTeamId', $id);
-            })->get();
+            })->orderBy('date', 'desc')
+            ->get();
     $ret = array();
-    $past = array();
     $cacheTeams = array();
     $cacheTeams[$team->id] = $team;
     foreach ($fixtures as $f)
@@ -190,19 +221,13 @@ $app->get('/team/{id:[0-9]+}', function ($id) use ($app) {
                 $f->penaltiesHome,
                 $f->penaltiesAway);
         
-        if(strtotime($fixture->date) >= time())
-        {
-            $ret[] = $fixture;
-        }
-        else
-        {
-            $past[] = $fixture;
-        }
+        
+        $ret[] = $fixture;
     }
   
     return response()->json(new \App\Http\Models\TeamDetails($team->id, $team->name, 
             $team->code, $team->logo,
-            $ret, $past,
+            $ret,
             new \App\Http\Models\Links(
                     env('APP_URL') . "/team/" . $id,
                     "null",

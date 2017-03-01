@@ -39,7 +39,7 @@ class HarvestFixture extends Command
                 {
                     $client = new \GuzzleHttp\Client();
                     $request = $client->get('http://api.football-data.org/v1/teams/' . 
-                            $t->teamId . '/fixtures',
+                            $t->teamId . '/fixtures?timeFrame=n60',
                             [
                             'headers' => [
                                 'User-Agent'  => 'testing/1.0',
@@ -47,8 +47,32 @@ class HarvestFixture extends Command
                                 'X-Auth-Token'=> env('APIKEY')
                             ]
                         ]);
+                    
+                    $request2 = $client->get('http://api.football-data.org/v1/teams/' . 
+                            $t->teamId . '/fixtures?timeFrame=p30',
+                            [
+                            'headers' => [
+                                'User-Agent'  => 'testing/1.0',
+                                'Accept'      => 'application/json',
+                                'X-Auth-Token'=> env('APIKEY')
+                            ]
+                        ]);
+                    
                     $response = json_decode($request->getBody());
                     foreach ($response->fixtures as $f)
+                    {
+                        if(!$this->existsFixture($f->_links->self->href))
+                        {
+                            $this->registerFixture($f);
+                        }   
+                        else
+                        {
+                            $this->updateFixture($f, $t);
+                        }
+                    }
+                    
+                    $response2 = json_decode($request2->getBody());
+                    foreach ($response2->fixtures as $f)
                     {
                         if(!$this->existsFixture($f->_links->self->href))
                         {

@@ -9,18 +9,17 @@ namespace App\Http\Models;
 
 class TeamDetails
 {
-    public $id, $name, $code, $logo, $pastGames, $futureGames,
+    public $id, $name, $code, $logo, $games,
             $links;
     
-    public function __construct($id, $name, $code, $logo, $pastGames, $futureGames,
+    public function __construct($id, $name, $code, $logo, $games,
             $links)
     {
         $this->id = $id;
         $this->name = $name;
         $this->code = $code;
         $this->logo = $logo;
-        $this->pastGames = $pastGames;
-        $this->futureGames = $futureGames;
+        $this->games = $games;
         $this->links = $links;
     }
 }
