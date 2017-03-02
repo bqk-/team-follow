@@ -172,14 +172,15 @@ $app->get('/monitors/{userId:[0-9]+}/fixtures/{page:[0-9]+}', function ($userId,
         return response()->json(null);
     }
     
-    $before = date('Y-m-d', time() - (7 * 3600 * 24));
-    $after = date('Y-m-d', time() - (8 * 3600));
+    $before = date('Y-m-d', strtotime('yesterday'));
+    $after = date('Y-m-d', strtotime('+1 week'));
     $monitors = \App\Database\Monitor::where('userId', $user->id)->select('teamId')->get();
     $query = App\Database\Fixture::where('date', '>', $before)
-            ->where('date', '<', $after)
-            ->whereRaw('homeTeamId in (' . $monitors->implode(',') . ') or '
-                    . 'awayTeamId in (' . $monitors->implode(',') . ')')
+            ->where('date', '<=', $after)
+            ->whereRaw('(homeTeamId in (' . $monitors->implode('teamId', ',') . ') or '
+                    . 'awayTeamId in (' . $monitors->implode('teamId', ',') . '))')
             ->orderBy('date', 'desc');
+ 
     $count = $query->count();
     $fixtures = $query->skip($page * PAGESIZE)->take(PAGESIZE)->get();
     $ret = array();
