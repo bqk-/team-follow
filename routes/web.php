@@ -232,9 +232,9 @@ $app->get('/monitors/{userId:[0-9]+}/fixtures/{page:[0-9]+}', function ($userId,
     return response()->json(new \App\Http\Models\UpcomingFixtures(
             $ret,
             new \App\Http\Models\Links(
-                    env('APP_URL') . "/monitors/" . $user->id . '/fixtures/' . $page,
-                    ($page + 1 * PAGESIZE < $count ? env('APP_URL') . "/monitors/" . $user->id . '/fixtures/' . ($page + 1) : "null"),
-                    ($page > 0 ? env('APP_URL') . "/monitors/" . $user->id . '/fixtures/' . ($page - 1) : "null") 
+                    env('APP_URL') . "/monitors/" . $userId . '/fixtures/' . $page,
+                    ($page + 1 * PAGESIZE < $count ? env('APP_URL') . "/monitors/" . $userId . '/fixtures/' . ($page + 1) : "null"),
+                    ($page > 0 ? env('APP_URL') . "/monitors/" . $userId . '/fixtures/' . ($page - 1) : "null") 
                     )
             ));
 });
