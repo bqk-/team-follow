@@ -142,7 +142,7 @@ $app->delete('manage/monitors/delete/{user:[0-9]+}/{id:[0-9]+}', function($user,
         return response()->json(false);
     }
     
-    $monitor = App\Database\Monitor::where('teamId', '=', $id)
+    $monitor = App\Database\Monitor::where('id', '=', $id)
         ->where('userId', $user->id)
         ->first();
     if($monitor == null)
@@ -153,6 +153,90 @@ $app->delete('manage/monitors/delete/{user:[0-9]+}/{id:[0-9]+}', function($user,
     $monitor->delete();
     
     return response()->json(true);
+});
+
+$app->get('/monitors/{userId:[0-9]+}/fixtures/{page:[0-9]+}', function ($userId, $page) use ($app) {
+    if($userId == null)
+    {
+        return response()->json(null);
+    }
+    
+    if($page == null)
+    {
+        return response()->json(null);
+    }
+    
+    $user = App\Database\User::where('fb_id', $userId)->first();
+    if($user == null)
+    {
+        return response()->json(null);
+    }
+    
+    $before = date('Y-m-d', time() - (7 * 3600 * 24));
+    $after = date('Y-m-d', time() - (8 * 3600));
+    $monitors = \App\Database\Monitor::where('userId', $user->id)->select('teamId')->get();
+    $query = App\Database\Fixture::where('date', '>', $before)
+            ->where('date', '<', $after)
+            ->whereRaw('homeTeamId in (' + $monitors->implode(',') + ') or '
+                    . 'awayTeamId in (' + $monitors->implode(',') + ')')
+            ->orderBy('date', 'desc');
+    $count = $query->count();
+    $fixtures = $query->skip($page * PAGESIZE)->take(PAGESIZE)->get();
+    $ret = array();
+    $cacheTeams = array();
+    foreach ($fixtures as $f)
+    {
+        if(!isset($cacheTeams[$f->homeTeamId]))
+        {
+            $t = App\Database\Team::find($f->homeTeamId);
+            if($t == null)
+            {
+                continue;
+            }
+            
+            $cacheTeams[$t->id] = $t;
+        }
+        
+        if(!isset($cacheTeams[$f->awayTeamId]))
+        {
+            $t = App\Database\Team::find($f->awayTeamId);
+            if($t == null)
+            {
+                continue;
+            }
+            
+            $cacheTeams[$t->id] = $t;
+        }
+        
+        $home = $cacheTeams[$f->homeTeamId];
+        $away = $cacheTeams[$f->awayTeamId];
+        
+        $fixture = new App\Http\Models\Game($f->id, $f->date,
+                new \App\Http\Models\Team($home->id, $home->name, $home->code, $home->logo,
+                        env('APP_URL') . "/team/" . $home->id),
+                new \App\Http\Models\Team($away->id, $away->name, $away->code, $away->logo,
+                        env('APP_URL') . "/team/" . $away->id),
+                $f->status,
+                $f->competitionId,
+                $f->homeGoals,
+                $f->awayGoals,
+                $f->extraTimeHomeGoals,
+                $f->extraTimeAwayGoals,
+                $f->penaltiesHome,
+                $f->penaltiesAway);
+        
+        
+        $ret[] = $fixture;
+    }
+  
+    return response()->json(new \App\Http\Models\UpcomingFixtures(
+            $ret,
+            new \App\Http\Models\Links(
+                    env('APP_URL') . "/monitors/" . $user->id . '/fixtures/' . $page,
+                    ($page + 1 * PAGESIZE < $count ? env('APP_URL') . "/monitors/" . $user->id . '/fixtures/' . ($page + 1) : "null"),
+                    ($page > 0 ? env('APP_URL') . "/monitors/" . $user->id . '/fixtures/' . ($page - 1) : "null") 
+                    )
+            ));
 });
 
 $app->get('/team/{id:[0-9]+}', function ($id) use ($app) {
