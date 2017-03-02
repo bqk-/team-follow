@@ -177,8 +177,8 @@ $app->get('/monitors/{userId:[0-9]+}/fixtures/{page:[0-9]+}', function ($userId,
     $monitors = \App\Database\Monitor::where('userId', $user->id)->select('teamId')->get();
     $query = App\Database\Fixture::where('date', '>', $before)
             ->where('date', '<', $after)
-            ->whereRaw('homeTeamId in (' + $monitors->implode(',') + ') or '
-                    . 'awayTeamId in (' + $monitors->implode(',') + ')')
+            ->whereRaw('homeTeamId in (' . $monitors->implode(',') . ') or '
+                    . 'awayTeamId in (' . $monitors->implode(',') . ')')
             ->orderBy('date', 'desc');
     $count = $query->count();
     $fixtures = $query->skip($page * PAGESIZE)->take(PAGESIZE)->get();
