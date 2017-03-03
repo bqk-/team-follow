@@ -31,8 +31,9 @@ class Monitor extends Command
         {
             date_default_timezone_set("UTC"); 
             $now = time();
-            $fixtures = App\Database\Fixture::whereDate('date', '>=', date('Y-m-d\TH:i', $now))
-                    ->whereDate('date', '<=', date('Y-m-d\TH:i', $now + 10800));
+            $fixtures = \App\Database\Fixture::whereDate('date', '>=', date('Y-m-d\TH:i', $now))
+                    ->whereDate('date', '<=', date('Y-m-d\TH:i', $now + 10800))
+                    ->where('status', '!=', 'FINISHED');
             foreach ($fixtures as $t)  
             {
                 $client = new \GuzzleHttp\Client();
