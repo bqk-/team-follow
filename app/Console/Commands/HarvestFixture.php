@@ -61,26 +61,26 @@ class HarvestFixture extends Command
                     $response = json_decode($request->getBody());
                     foreach ($response->fixtures as $f)
                     {
-                        if(!$this->existsFixture($f->_links->self->href))
+                        if(($ff = $this->getFixture($f->_links->self->href)) == null)
                         {
                             $this->registerFixture($f);
                         }   
                         else
                         {
-                            $this->updateFixture($f, $t);
+                            $this->updateFixture($f, $ff);
                         }
                     }
                     
                     $response2 = json_decode($request2->getBody());
                     foreach ($response2->fixtures as $f)
                     {
-                        if(!$this->existsFixture($f->_links->self->href))
+                        if(($ff = $this->getFixture($f->_links->self->href)) == null)
                         {
                             $this->registerFixture($f);
                         }   
                         else
                         {
-                            $this->updateFixture($f, $t);
+                            $this->updateFixture($f, $ff);
                         }
                     }
                 }
@@ -92,11 +92,11 @@ class HarvestFixture extends Command
         }
     }
     
-    private function existsFixture($href)
+    private function getFixture($href)
     {
         $id = substr($href, strrpos($href, '/') + 1, strlen($href) - 1);
-        $t = \App\Database\Fixture::find($id);
-        return $t != null;
+        $f = \App\Database\Fixture::find($id);
+        return $f;
     }
     
     private function registerFixture($f)
