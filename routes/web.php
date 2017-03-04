@@ -179,7 +179,7 @@ $app->get('/monitors/{userId:[0-9]+}/fixtures/{page:[0-9]+}', function ($userId,
             ->where('date', '<=', $after)
             ->whereRaw('(homeTeamId in (' . $monitors->implode('teamId', ',') . ') or '
                     . 'awayTeamId in (' . $monitors->implode('teamId', ',') . '))')
-            ->orderBy('date', 'desc');
+            ->orderBy('date', 'asc');
  
     $count = $query->count();
     $fixtures = $query->skip($page * PAGESIZE)->take(PAGESIZE)->get();
@@ -246,6 +246,7 @@ $app->get('/monitors/fixtures/current', function () use ($app) {
     $fixtures = \App\Database\Fixture::where('status', '!=', 'FINISHED')
                     ->where('date', '<=', date('Y-m-d\TH:i', $now + 10800))
                     ->where('date', '>=', date('Y-m-d\TH:i', $now))
+            ->orderBy('date', 'asc')
             ->get();
     
     $ret = array();
