@@ -67,7 +67,7 @@ class Monitor extends Command
                         $t->penaltiesAway = $f->result->penaltyShootout->goalsAwayTeam;
                     }
                     
-                    echo 'Game update: ' . $f->status .  PHP_EOL;
+                    echo 'Game update: ' . $t->status .  PHP_EOL;
                     $t->save();
                 }
             }
