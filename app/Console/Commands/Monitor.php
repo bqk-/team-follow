@@ -33,7 +33,7 @@ class Monitor extends Command
             $now = time();
                 $fixtures = \App\Database\Fixture::where('status', '!=', 'FINISHED')
                     ->where('date', '<=', date('Y-m-d\TH:i', $now + 10800))
-                    ->where('date', '>=', date('Y-m-d\TH:i', $now))
+                    ->where('date', '>=', date('Y-m-d\TH:i', $now - 10800))
                     ->get();
             foreach ($fixtures as $t)  
             {
