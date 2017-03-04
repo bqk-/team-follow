@@ -244,7 +244,7 @@ $app->get('/monitors/fixtures/current', function () use ($app) {
     date_default_timezone_set("UTC"); 
     $now = time();
     $fixtures = \App\Database\Fixture::where('status', '!=', 'FINISHED')
-                    ->where('date', '<=', date('Y-m-d\TH:i', $now + 10800))
+                    ->where('date', '<=', date('Y-m-d\TH:i', $now))
                     ->where('date', '>=', date('Y-m-d\TH:i', $now - 10800))
             ->orderBy('date', 'asc')
             ->get();

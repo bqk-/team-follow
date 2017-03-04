@@ -32,7 +32,7 @@ class Monitor extends Command
             date_default_timezone_set("UTC"); 
             $now = time();
                 $fixtures = \App\Database\Fixture::where('status', '!=', 'FINISHED')
-                    ->where('date', '<=', date('Y-m-d\TH:i', $now + 10800))
+                    ->where('date', '<=', date('Y-m-d\TH:i', $now))
                     ->where('date', '>=', date('Y-m-d\TH:i', $now - 10800))
                     ->get();
             foreach ($fixtures as $t)  
@@ -49,6 +49,7 @@ class Monitor extends Command
                     ]);
                 $response = json_decode($request->getBody());
                 $f = $response->fixture;
+                
                 if(isset($f->result) && $this->hasChanged($t, $f))
                 {
                     $t->homeGoals = $f->result->goalsHomeTeam;
