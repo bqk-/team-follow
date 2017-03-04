@@ -65,7 +65,7 @@ class Monitor extends Command
                         $t->penaltiesAway = $f->result->penaltyShootout->goalsAwayTeam;
                     }
                     
-                    echo 'Score update: ' . print_r($f->result) .  PHP_EOL;
+                    echo 'Game update: ' . print_r($f->status, $f->result) .  PHP_EOL;
                     $t->save();
                 }
             }
@@ -78,18 +78,19 @@ class Monitor extends Command
     
     private function hasChanged(\App\Database\Fixture $t, $json)
     {
-        $equals = $t->homeGoals == $json->result->goalsHomeTeam
-        && $t->awayGoals == $json->result->goalsAwayTeam;
+        $equals = $t->status === $json->status;
+        $equals &= $t->homeGoals === $json->result->goalsHomeTeam
+        && $t->awayGoals === $json->result->goalsAwayTeam;
         if(isset($json->result->extraTime))
         {
-            $equals &= $t->extraTimeHomeGoals == $json->result->extraTime->goalsHomeTeam
-            && $t->extraTimeAwayGoals == $json->result->extraTime->goalsAwayTeam;
+            $equals &= $t->extraTimeHomeGoals === $json->result->extraTime->goalsHomeTeam
+            && $t->extraTimeAwayGoals === $json->result->extraTime->goalsAwayTeam;
         }
 
         if(isset($json->result->penaltyShootout))
         {
-            $equals &= $t->penaltiesHome == $json->result->penaltyShootout->goalsHomeTeam
-            && $t->penaltiesAway = $json->result->penaltyShootout->goalsAwayTeam;
+            $equals &= $t->penaltiesHome === $json->result->penaltyShootout->goalsHomeTeam
+            && $t->penaltiesAway === $json->result->penaltyShootout->goalsAwayTeam;
         }
         
         return !$equals;
