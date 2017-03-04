@@ -76,7 +76,7 @@ class Monitor extends Command
         }
     }
     
-    private function hasChanged(Fixture $t, $json)
+    private function hasChanged(\App\Database\Fixture $t, $json)
     {
         $equals = $t->homeGoals == $json->result->goalsHomeTeam
         && $t->awayGoals == $json->result->goalsAwayTeam;
