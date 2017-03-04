@@ -53,6 +53,7 @@ class Monitor extends Command
                 {
                     $t->homeGoals = $f->result->goalsHomeTeam;
                     $t->awayGoals = $f->result->goalsAwayTeam;
+                    $t->status = $f->result->status;
                     if(isset($f->result->extraTime))
                     {
                         $t->extraTimeHomeGoals = $f->result->extraTime->goalsHomeTeam;
@@ -65,7 +66,7 @@ class Monitor extends Command
                         $t->penaltiesAway = $f->result->penaltyShootout->goalsAwayTeam;
                     }
                     
-                    echo 'Game update: ' . $f->status . print_r($f->result) .  PHP_EOL;
+                    echo 'Game update: ' . $f->status .  PHP_EOL;
                     $t->save();
                 }
             }
