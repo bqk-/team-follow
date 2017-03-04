@@ -133,11 +133,21 @@ class HarvestFixture extends Command
                 $t->extraTimeHomeGoals = $f->result->extraTime->goalsHomeTeam;
                 $t->extraTimeAwayGoals = $f->result->extraTime->goalsAwayTeam;
             }
+            else
+            {
+                $t->extraTimeHomeGoals = null;
+                $t->extraTimeAwayGoals = null;
+            }
             
             if(isset($f->result->penaltyShootout))
             {
                 $t->penaltiesHome = $f->result->penaltyShootout->goalsHomeTeam;
                 $t->penaltiesAway = $f->result->penaltyShootout->goalsAwayTeam;
+            }
+            else
+            {
+                $t->penaltiesHome = null;
+                $t->penaltiesAway = null;
             }
         }
         
