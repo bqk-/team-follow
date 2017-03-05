@@ -7,6 +7,7 @@
  */
 namespace App\Console\Commands;
 use Illuminate\Console\Command;
+
 /**
  * Description of EmailLogs
  *
@@ -35,6 +36,39 @@ class EmailLogs extends Command
      */
     public function handle()
     {
-        //todo
+        \Illuminate\Support\Facades\Mail::to('clcsblack@gmail.com')
+                ->send(new Log);
+        
+        @unlink(__DIR__.'/../Logs/Teams.txt');
+        @unlink(__DIR__.'/../Logs/Monitors.txt');
+        @unlink(__DIR__.'/../Logs/Fixtures.txt');
+    }
+}
+
+class Log extends \Illuminate\Mail\Mailable
+{
+    /**
+     * Create a new message instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+    }
+    
+    /**
+     * Build the message.
+     *
+     * @return $this
+     */
+    public function build()
+    {
+        return $this->view('email')
+                    ->from('team-follow@bqk.ddns.net')
+                    ->with([
+                        'teams' => @file_get_contents(__DIR__.'/../Logs/Teams.txt'),
+                        'monitors' => @file_get_contents(__DIR__.'/../Logs/Monitors.txt'),
+                        'fixtures' => @file_get_contents(__DIR__.'/../Logs/Fixtures.txt'),
+                    ]);
     }
 }

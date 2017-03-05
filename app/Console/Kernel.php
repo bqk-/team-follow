@@ -16,6 +16,7 @@ class Kernel extends ConsoleKernel
         Commands\HarvestTeam::class,
         Commands\HarvestFixture::class,
         Commands\Monitor::class,
+        Commands\EmailLogs::class,
     ];
 
     /**
