@@ -173,10 +173,10 @@ $app->get('/monitors/{userId:[0-9]+}/fixtures/{page:[0-9]+}', function ($userId,
     }
     
     $before = date('Y-m-d', strtotime('yesterday'));
-    $after = date('Y-m-d', strtotime('+1 week'));
+    //$after = date('Y-m-d', strtotime('+1 week'));
     $monitors = \App\Database\Monitor::where('userId', $user->id)->select('teamId')->get();
     $query = App\Database\Fixture::where('date', '>', $before)
-            ->where('date', '<=', $after)
+            //->where('date', '<=', $after)
             ->whereRaw('(homeTeamId in (' . $monitors->implode('teamId', ',') . ') or '
                     . 'awayTeamId in (' . $monitors->implode('teamId', ',') . '))')
             ->orderBy('date', 'asc');
