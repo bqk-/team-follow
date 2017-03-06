@@ -67,8 +67,10 @@ class Monitor extends Command
                         $t->penaltiesAway = $f->result->penaltyShootout->goalsAwayTeam;
                     }
                     
-                    echo 'Game update: ' . $f->homeTeamName .' ' . $f->result->goalsHomeTeam .
+                    $notification = 'Game update: ' . $f->homeTeamName .' ' . $f->result->goalsHomeTeam .
                             ' vs ' . $f->result->goalsAwayTeam . ' ' . $f->awayTeamName . ' / ' . $t->status .  PHP_EOL;
+                    $this->sendNotification($notification);
+                    echo $notification;
                     $t->save();
                 }
             }
@@ -77,6 +79,25 @@ class Monitor extends Command
             sleep(60);
             $this->handle();
         }
+    }
+    
+    private function sendNotification($message)
+    {
+        curl_setopt_array($ch = curl_init(), array(
+        CURLOPT_URL => "https://api.pushed.co/1/push",
+        CURLOPT_CUSTOMREQUEST => "POST",
+        CURLOPT_POSTFIELDS => array(
+          "app_key" => env('PUSH_KEY'),
+          "app_secret" => env('PUSH_SECRET'),
+          "target_type" => "channel",
+          "target_alias" => 'VdJ5HT',
+          "content" => substr($message, 0, 140)
+        ),
+        CURLOPT_SAFE_UPLOAD => true,
+        CURLOPT_RETURNTRANSFER => true
+      ));
+      curl_exec($ch);
+      curl_close($ch);
     }
     
     private function hasChanged(\App\Database\Fixture $t, $json)

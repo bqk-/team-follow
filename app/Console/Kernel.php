@@ -30,5 +30,6 @@ class Kernel extends ConsoleKernel
        $schedule->command('harvest:team')->dailyAt('02:00')->appendOutputTo(__DIR__."/Logs/Teams.txt");
        $schedule->command('harvest:fixture')->dailyAt('03:00')->appendOutputTo(__DIR__."/Logs/Fixtures.txt");
        $schedule->command('harvest:monitor')->everyMinute()->appendOutputTo(__DIR__."/Logs/Monitors.txt");
+       $schedule->command('email:logs')->dailyAt('04:00');
     }
 }
