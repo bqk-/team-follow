@@ -175,6 +175,18 @@ $app->get('/monitors/{userId:[0-9]+}/fixtures/{page:[0-9]+}', function ($userId,
     $before = date('Y-m-d', strtotime('yesterday'));
     //$after = date('Y-m-d', strtotime('+1 week'));
     $monitors = \App\Database\Monitor::where('userId', $user->id)->select('teamId')->get();
+    if($monitors->count() == 0)
+    {
+        return response()->json(new \App\Http\Models\UpcomingFixtures(
+            array(),
+            new \App\Http\Models\Links(
+                    env('APP_URL') . "/monitors/" . $userId . '/fixtures/' . $page,
+                    "null",
+                    "null"
+                    )
+            ));
+    }
+    
     $query = App\Database\Fixture::where('date', '>', $before)
             //->where('date', '<=', $after)
             ->whereRaw('(homeTeamId in (' . $monitors->implode('teamId', ',') . ') or '
