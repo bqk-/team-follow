@@ -49,7 +49,7 @@ class Monitor extends Command
                     ]);
                 $response = json_decode($request->getBody());
                 $f = $response->fixture;
-                
+ 
                 if(isset($f->result) && $this->hasChanged($t, $f))
                 {
                     $t->homeGoals = $f->result->goalsHomeTeam;
@@ -103,18 +103,18 @@ class Monitor extends Command
     private function hasChanged(\App\Database\Fixture $t, $json)
     {
         $equals = $t->status === $json->status;
-        $equals &= $t->homeGoals === $json->result->goalsHomeTeam
-        && $t->awayGoals === $json->result->goalsAwayTeam;
+        $equals &= (int)$t->homeGoals === $json->result->goalsHomeTeam
+        && (int)$t->awayGoals === $json->result->goalsAwayTeam;
         if(isset($json->result->extraTime))
         {
-            $equals &= $t->extraTimeHomeGoals === $json->result->extraTime->goalsHomeTeam
-            && $t->extraTimeAwayGoals === $json->result->extraTime->goalsAwayTeam;
+            $equals &= (int)$t->extraTimeHomeGoals === $json->result->extraTime->goalsHomeTeam
+            && (int)$t->extraTimeAwayGoals === $json->result->extraTime->goalsAwayTeam;
         }
 
         if(isset($json->result->penaltyShootout))
         {
-            $equals &= $t->penaltiesHome === $json->result->penaltyShootout->goalsHomeTeam
-            && $t->penaltiesAway === $json->result->penaltyShootout->goalsAwayTeam;
+            $equals &= (int)$t->penaltiesHome === $json->result->penaltyShootout->goalsHomeTeam
+            && (int)$t->penaltiesAway === $json->result->penaltyShootout->goalsAwayTeam;
         }
         
         return !$equals;
