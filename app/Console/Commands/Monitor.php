@@ -32,6 +32,7 @@ class Monitor extends Command
             date_default_timezone_set("UTC"); 
             $now = time();
                 $fixtures = \App\Database\Fixture::where('status', '!=', 'FINISHED')
+                        ->where('status', '!=', 'POSTPONED')
                     ->where('date', '<=', date('Y-m-d\TH:i', $now))
                     ->where('date', '>=', date('Y-m-d\TH:i', $now - 10800))
                     ->get();
