@@ -32,7 +32,6 @@ class Monitor extends Command
             date_default_timezone_set("UTC"); 
             $now = time();
                 $fixtures = \App\Database\Fixture::where('status', '!=', 'FINISHED')
-                        ->where('status', '!=', 'POSTPONED')
                     ->where('date', '<=', date('Y-m-d\TH:i', $now))
                     ->where('date', '>=', date('Y-m-d\TH:i', $now - 10800))
                     ->get();
@@ -104,18 +103,18 @@ class Monitor extends Command
     private function hasChanged(\App\Database\Fixture $t, $json)
     {
         $equals = $t->status === $json->status;
-        $equals &= (int)$t->homeGoals === $json->result->goalsHomeTeam
-        && (int)$t->awayGoals === $json->result->goalsAwayTeam;
+        $equals &= $t->homeGoals === $json->result->goalsHomeTeam
+        && $t->awayGoals === $json->result->goalsAwayTeam;
         if(isset($json->result->extraTime))
         {
-            $equals &= (int)$t->extraTimeHomeGoals === $json->result->extraTime->goalsHomeTeam
-            && (int)$t->extraTimeAwayGoals === $json->result->extraTime->goalsAwayTeam;
+            $equals &= $t->extraTimeHomeGoals === $json->result->extraTime->goalsHomeTeam
+            && $t->extraTimeAwayGoals === $json->result->extraTime->goalsAwayTeam;
         }
 
         if(isset($json->result->penaltyShootout))
         {
-            $equals &= (int)$t->penaltiesHome === $json->result->penaltyShootout->goalsHomeTeam
-            && (int)$t->penaltiesAway === $json->result->penaltyShootout->goalsAwayTeam;
+            $equals &= $t->penaltiesHome === $json->result->penaltyShootout->goalsHomeTeam
+            && $t->penaltiesAway === $json->result->penaltyShootout->goalsAwayTeam;
         }
         
         return !$equals;
