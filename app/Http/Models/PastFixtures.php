@@ -12,7 +12,7 @@ namespace App\Http\Models;
  *
  * @author thibault
  */
-class UpcomingFixtures
+class PastFixtures
 {
     public $games, $_links;
     public function __construct($games, $links)
