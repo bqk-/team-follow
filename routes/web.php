@@ -124,7 +124,7 @@ $app->post('/manage/monitors/new/{user:[0-9]+}/{id:[0-9]+}', function ($user, $i
     return response()->json(true);
 });
 
-$app->delete('manage/monitors/delete/{user:[0-9]+}/{id:[0-9]+}', function($user, $id) use ($app){
+$app->delete('manage/monitors/delete/{user:[0-9]+}/{teamId:[0-9]+}', function($user, $teamId) use ($app){
     if($id == null || $user == null) 
     {
         return response()->json(false);
@@ -136,13 +136,7 @@ $app->delete('manage/monitors/delete/{user:[0-9]+}/{id:[0-9]+}', function($user,
         return response()->json(false);
     }
     
-    $team = App\Database\Team::find($id);
-    if($team == null)
-    {
-        return response()->json(false);
-    }
-    
-    $monitor = App\Database\Monitor::where('id', '=', $id)
+    $monitor = App\Database\Monitor::where('teamId', '=', $teamId)
         ->where('userId', $user->id)
         ->first();
     if($monitor == null)
