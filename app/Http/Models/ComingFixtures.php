@@ -8,11 +8,11 @@
 namespace App\Http\Models;
 
 /**
- * Description of UpcomingFixtures
+ * Description of ComingFixtures
  *
  * @author thibault
  */
-class UpcomingFixtures
+class ComingFixtures
 {
     public $games, $_links;
     public function __construct($games, $links)
