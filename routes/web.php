@@ -405,7 +405,7 @@ $app->get('/monitors/fixtures/current', function () use ($app) {
         $ret[] = $fixture;
     }
   
-    return response()->json(new \App\Http\Models\UpcomingFixtures(
+    return response()->json(new \App\Http\Models\ComingFixtures(
             $ret,
             new \App\Http\Models\Links(
                     env('APP_URL') . "/monitors/fixtures/current",
