@@ -40,6 +40,23 @@ $app->get('/teams/{page:[0-9]+}', function ($page = 0) use ($app) {
             ));
 });
 
+$app->post('/user/login/{token}', function ($token) use ($app) {
+    list($u, $p) = explode(":", base64_decode($token));
+    
+    $user = App\Database\User::where("username", $u)->first();
+    if($user == null)
+    {
+        $newUser = new App\Database\User;
+        $newUser->username = $u;
+        $newUser->password = password_hash($p);
+        $newUser->save();
+        
+        return response()->json(true);
+    }
+    
+    return response()->json(password_verify($p, $user->password));
+});
+
 $app->get('/teams/search/{search:[a-zA-Z0-9]+}', function ($search = "") use ($app) {
     if($search == null)
     {
@@ -70,34 +87,9 @@ $app->get('/teams/search/{search:[a-zA-Z0-9]+}', function ($search = "") use ($a
             ));
 });
 
-$app->post('/manage/users/new/{id:[0-9]+}', function ($id) use ($app) {
-    if($id == null)
-    {
-        return response()->json(false);
-    }
-    
-    $user = App\Database\User::where('fb_id',$id)->first();
-    if($user != null)
-    {
-        return response()->json(true);
-    }
-    
-    $user = new App\Database\User;
-    $user->fb_id = $id;
-    $user->date = date('Y-m-d H:i:s', time());
-    $user->save();
-    
-    return response()->json(true);
-});
-
-$app->post('/manage/monitors/new/{user:[0-9]+}/{id:[0-9]+}', function ($user, $id) use ($app) {
+$app->post('/monitors/new/{id:[0-9]+}', ['middleware' => 'auth', function ($id) use ($app) {
+    $user = Auth::user();
     if($id == null || $user == null) 
-    {
-        return response()->json(false);
-    }
-    
-    $user = App\Database\User::where('fb_id', $user)->first();
-    if($user == null)
     {
         return response()->json(false);
     }
@@ -122,16 +114,11 @@ $app->post('/manage/monitors/new/{user:[0-9]+}/{id:[0-9]+}', function ($user, $i
     $monitor->save();
     
     return response()->json(true);
-});
+}]);
 
-$app->delete('manage/monitors/delete/{user:[0-9]+}/{teamId:[0-9]+}', function($user, $teamId) use ($app){
+$app->delete('/monitors/delete/{teamId:[0-9]+}', ['middleware' => 'auth', function($teamId) use ($app){
+    $user = Auth::user();
     if($id == null || $user == null) 
-    {
-        return response()->json(false);
-    }
-    
-    $user = App\Database\User::where('fb_id', $user)->first();
-    if($user == null)
     {
         return response()->json(false);
     }
@@ -147,20 +134,16 @@ $app->delete('manage/monitors/delete/{user:[0-9]+}/{teamId:[0-9]+}', function($u
     $monitor->delete();
     
     return response()->json(true);
-});
+}]);
 
-$app->get('/monitors/{userId:[0-9]+}/fixtures/past/{page:[0-9]+}', function ($userId, $page) use ($app) {
-    if($userId == null)
-    {
-        return response()->json(null);
-    }
-    
+$app->get('/monitors/fixtures/past/{page:[0-9]+}', 
+        ['middleware' => 'auth', function ($page) use ($app) {
     if($page == null)
     {
         return response()->json(null);
     }
     
-    $user = App\Database\User::where('fb_id', $userId)->first();
+    $user = Auth::user();
     if($user == null)
     {
         return response()->json(null);
@@ -174,7 +157,7 @@ $app->get('/monitors/{userId:[0-9]+}/fixtures/past/{page:[0-9]+}', function ($us
         return response()->json(new \App\Http\Models\PastFixtures(
             array(),
             new \App\Http\Models\Links(
-                    env('APP_URL') . "/monitors/" . $userId . '/fixtures/' . $page,
+                    env('APP_URL') . "/monitors/" . $user->id . '/fixtures/' . $page,
                     "null",
                     "null"
                     )
@@ -239,25 +222,21 @@ $app->get('/monitors/{userId:[0-9]+}/fixtures/past/{page:[0-9]+}', function ($us
     return response()->json(new \App\Http\Models\PastFixtures(
             $ret,
             new \App\Http\Models\Links(
-                    env('APP_URL') . "/monitors/" . $userId . '/fixtures/' . $page,
-                    ($page + 1 * PAGESIZE < $count ? env('APP_URL') . "/monitors/" . $userId . '/fixtures/' . ($page + 1) : "null"),
-                    ($page > 0 ? env('APP_URL') . "/monitors/" . $userId . '/fixtures/' . ($page - 1) : "null") 
+                    env('APP_URL') . "/monitors/" . $user->id . '/fixtures/' . $page,
+                    ($page + 1 * PAGESIZE < $count ? env('APP_URL') . "/monitors/" . $user->id . '/fixtures/' . ($page + 1) : "null"),
+                    ($page > 0 ? env('APP_URL') . "/monitors/" . $user->id . '/fixtures/' . ($page - 1) : "null") 
                     )
             ));
-});
+}]);
 
-$app->get('/monitors/{userId:[0-9]+}/fixtures/coming/{page:[0-9]+}', function ($userId, $page) use ($app) {
-    if($userId == null)
-    {
-        return response()->json(null);
-    }
-    
+$app->get('/monitors/fixtures/coming/{page:[0-9]+}', 
+        ['middleware' => 'auth', function ($page) use ($app) {
     if($page == null)
     {
         return response()->json(null);
     }
     
-    $user = App\Database\User::where('fb_id', $userId)->first();
+    $user = Auth::user();
     if($user == null)
     {
         return response()->json(null);
@@ -271,7 +250,7 @@ $app->get('/monitors/{userId:[0-9]+}/fixtures/coming/{page:[0-9]+}', function ($
         return response()->json(new \App\Http\Models\ComingFixtures(
             array(),
             new \App\Http\Models\Links(
-                    env('APP_URL') . "/monitors/" . $userId . '/fixtures/' . $page,
+                    env('APP_URL') . "/monitors/" . $user->id . '/fixtures/' . $page,
                     "null",
                     "null"
                     )
@@ -336,12 +315,12 @@ $app->get('/monitors/{userId:[0-9]+}/fixtures/coming/{page:[0-9]+}', function ($
     return response()->json(new \App\Http\Models\ComingFixtures(
             $ret,
             new \App\Http\Models\Links(
-                    env('APP_URL') . "/monitors/" . $userId . '/fixtures/' . $page,
-                    ($page + 1 * PAGESIZE < $count ? env('APP_URL') . "/monitors/" . $userId . '/fixtures/' . ($page + 1) : "null"),
-                    ($page > 0 ? env('APP_URL') . "/monitors/" . $userId . '/fixtures/' . ($page - 1) : "null") 
+                    env('APP_URL') . "/monitors/" . $user->id . '/fixtures/' . $page,
+                    ($page + 1 * PAGESIZE < $count ? env('APP_URL') . "/monitors/" . $user->id . '/fixtures/' . ($page + 1) : "null"),
+                    ($page > 0 ? env('APP_URL') . "/monitors/" . $user->id . '/fixtures/' . ($page - 1) : "null") 
                     )
             ));
-});
+}]);
 
 $app->get('/monitors/fixtures/current', function () use ($app) {
     date_default_timezone_set("UTC"); 
@@ -492,24 +471,15 @@ $app->get('/team/{id:[0-9]+}', function ($id) use ($app) {
 });
 
 
-$app->get('/monitors/{userId:[0-9]+}', function($userId) use ($app){
-    if($userId == 0) 
+$app->get('/monitors/current', 
+        ['middleware' => 'auth', function() use ($app){
+    $user = Auth::user();
+    if($user == nul) 
     {
         $monitors = \App\Database\Monitor::all();
     }
     else
     {
-        $user = App\Database\User::where('fb_id', $userId)->first();
-        if($user == null)
-        {
-            return response()->json(new \App\Http\Models\MonitorList(array(),
-                    new App\Http\Models\Links(
-                            env('APP_URL') . "/monitors/" . $userId,
-                            "null",
-                            "null"
-                            )));
-        }
-
         $monitors = App\Database\Monitor::where('userId', $user->id)->get();
     }
     
@@ -523,8 +493,8 @@ $app->get('/monitors/{userId:[0-9]+}', function($userId) use ($app){
     
     return response()->json(new \App\Http\Models\MonitorList($ret,
                 new App\Http\Models\Links(
-                        env('APP_URL') . "/monitors/" . $userId,
+                        env('APP_URL') . "/monitors/" . $user->id,
                         "null",
                         "null"
                         )));
-});
+}]);
