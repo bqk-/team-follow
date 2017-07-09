@@ -48,7 +48,7 @@ $app->post('/user/login/{token}', function ($token) use ($app) {
     {
         $newUser = new App\Database\User;
         $newUser->username = $u;
-        $newUser->password = password_hash($p);
+        $newUser->password = password_hash($p, PASSWORD_BCRYPT);
         $newUser->save();
         
         return response()->json(true);
