@@ -121,6 +121,10 @@ class HarvestFixture extends Command
         $t->awayTeamId = $id;
         $t->date = $f->date;
         $t->status = $f->status;
+        if(empty($t->status))
+        {
+            $t->status = "SCHEDULED";
+        }
         $href = $f->_links->competition->href;
         $id = substr($href, strrpos($href, '/') + 1, strlen($href) - 1);
         $t->competitionId = $id;
