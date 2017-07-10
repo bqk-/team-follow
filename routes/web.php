@@ -35,7 +35,7 @@ $app->get('/teams/{page:[0-9]+}', function ($page = 0) use ($app) {
     return response()->json(new \App\Http\Models\TeamList($ret,
             new \App\Http\Models\Links(
                     env('APP_URL') . "/teams/" . $page,
-                    ($page + 1 * PAGESIZE < $count ? env('APP_URL') . "/teams/" . ($page + 1) : "null"),
+                    (($page + 1) * PAGESIZE < $count ? env('APP_URL') . "/teams/" . ($page + 1) : "null"),
                     ($page > 0 ? env('APP_URL') . "/teams/" . ($page - 1) : "null") 
                     )
             ));
@@ -230,7 +230,7 @@ $app->get('/monitors/fixtures/past/{page:[0-9]+}',
             $ret,
             new \App\Http\Models\Links(
                     env('APP_URL') . "/monitors/fixtures/past/" . $page,
-                    ($page + 1 * PAGESIZE < $count ? env('APP_URL') . "/monitors/fixtures/past/" . ($page + 1) : "null"),
+                    (($page + 1) * PAGESIZE < $count ? env('APP_URL') . "/monitors/fixtures/past/" . ($page + 1) : "null"),
                     ($page > 0 ? env('APP_URL') . "/monitors/fixtures/past/" . ($page - 1) : "null") 
                     )
             ));
@@ -323,7 +323,7 @@ $app->get('/monitors/fixtures/coming/{page:[0-9]+}',
             $ret,
             new \App\Http\Models\Links(
                     env('APP_URL') . "/monitors/fixtures/coming/" . $page,
-                    ($page + 1 * PAGESIZE < $count ? env('APP_URL') . "/monitors/fixtures/coming/" . ($page + 1) : "null"),
+                    (($page + 1) * PAGESIZE < $count ? env('APP_URL') . "/monitors/fixtures/coming/" . ($page + 1) : "null"),
                     ($page > 0 ? env('APP_URL') . "/monitors/fixtures/coming/" . ($page - 1) : "null") 
                     )
             ));
