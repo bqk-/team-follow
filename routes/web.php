@@ -480,7 +480,7 @@ $app->get('/team/{id:[0-9]+}', function ($id) use ($app) {
 $app->get('/monitors', 
         ['middleware' => 'auth', function() use ($app){
     $user = Auth::user();
-    if($user == nul) 
+    if($user == null) 
     {
         $monitors = \App\Database\Monitor::all();
     }
