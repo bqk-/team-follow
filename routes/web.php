@@ -1,5 +1,5 @@
 <?php
-
+use Illuminate\Http\Request;
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -40,7 +40,13 @@ $app->get('/teams/{page:[0-9]+}', function ($page = 0) use ($app) {
             ));
 });
 
-$app->post('/user/login/{token}', function ($token) use ($app) {
+$app->post('/user/login', function (Request $request) {
+    $token = $request->header("token");
+    if(empty($token))
+    {
+        return response()->json(false);
+    }
+    
     list($u, $p) = explode(":", base64_decode($token));
     
     $user = App\Database\User::where("username", $u)->first();
