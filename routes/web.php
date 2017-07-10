@@ -56,7 +56,13 @@ $app->post('/user/login', function (Request $request) {
         return response()->json(false);
     }
     
-    return response()->json(password_verify($p, $user->password));
+    if(password_verify($p, $user->password))
+    {
+        $user->date = date("Y-m-d H:i:s", time());
+        return true;
+    }
+    
+    return response()->json(false);
 });
 
 $app->post('/user/register', function (Request $request) {
@@ -74,6 +80,7 @@ $app->post('/user/register', function (Request $request) {
         $newUser = new App\Database\User;
         $newUser->username = $u;
         $newUser->password = password_hash($p, PASSWORD_BCRYPT);
+        $newUser->date = date("Y-m-d H:i:s", time());
         $newUser->save();
         
         return response()->json(true);
