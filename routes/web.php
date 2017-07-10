@@ -477,7 +477,7 @@ $app->get('/team/{id:[0-9]+}', function ($id) use ($app) {
 });
 
 
-$app->get('/monitors/current', 
+$app->get('/monitors', 
         ['middleware' => 'auth', function() use ($app){
     $user = Auth::user();
     if($user == nul) 
