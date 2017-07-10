@@ -17,7 +17,8 @@ $app->get('/', function () use ($app) {
     return response()->json([
         "name" => "Team API",
         "version" => "0.1",
-        "teams" => env('APP_URL') . "/teams/0"
+        "teams" => env('APP_URL') . "/teams/0",
+        "live" => env('APP_URL'). "/monitors/fixtures/current"
     ]);
 });
 
@@ -163,7 +164,7 @@ $app->get('/monitors/fixtures/past/{page:[0-9]+}',
         return response()->json(new \App\Http\Models\PastFixtures(
             array(),
             new \App\Http\Models\Links(
-                    env('APP_URL') . "/monitors/" . $user->id . '/fixtures/' . $page,
+                    env('APP_URL') . "/monitors/fixtures/past/" . $page,
                     "null",
                     "null"
                     )
@@ -228,9 +229,9 @@ $app->get('/monitors/fixtures/past/{page:[0-9]+}',
     return response()->json(new \App\Http\Models\PastFixtures(
             $ret,
             new \App\Http\Models\Links(
-                    env('APP_URL') . "/monitors/" . $user->id . '/fixtures/' . $page,
-                    ($page + 1 * PAGESIZE < $count ? env('APP_URL') . "/monitors/" . $user->id . '/fixtures/' . ($page + 1) : "null"),
-                    ($page > 0 ? env('APP_URL') . "/monitors/" . $user->id . '/fixtures/' . ($page - 1) : "null") 
+                    env('APP_URL') . "/monitors/fixtures/past/" . $page,
+                    ($page + 1 * PAGESIZE < $count ? env('APP_URL') . "/monitors/fixtures/past/" . ($page + 1) : "null"),
+                    ($page > 0 ? env('APP_URL') . "/monitors/fixtures/past/" . ($page - 1) : "null") 
                     )
             ));
 }]);
@@ -256,7 +257,7 @@ $app->get('/monitors/fixtures/coming/{page:[0-9]+}',
         return response()->json(new \App\Http\Models\ComingFixtures(
             array(),
             new \App\Http\Models\Links(
-                    env('APP_URL') . "/monitors/" . $user->id . '/fixtures/' . $page,
+                    env('APP_URL') . "/monitors/fixtures/coming/" . $page,
                     "null",
                     "null"
                     )
@@ -321,9 +322,9 @@ $app->get('/monitors/fixtures/coming/{page:[0-9]+}',
     return response()->json(new \App\Http\Models\ComingFixtures(
             $ret,
             new \App\Http\Models\Links(
-                    env('APP_URL') . "/monitors/" . $user->id . '/fixtures/' . $page,
-                    ($page + 1 * PAGESIZE < $count ? env('APP_URL') . "/monitors/" . $user->id . '/fixtures/' . ($page + 1) : "null"),
-                    ($page > 0 ? env('APP_URL') . "/monitors/" . $user->id . '/fixtures/' . ($page - 1) : "null") 
+                    env('APP_URL') . "/monitors/fixtures/coming/" . $page,
+                    ($page + 1 * PAGESIZE < $count ? env('APP_URL') . "/monitors/fixtures/coming/" . ($page + 1) : "null"),
+                    ($page > 0 ? env('APP_URL') . "/monitors/fixtures/coming/" . ($page - 1) : "null") 
                     )
             ));
 }]);
@@ -499,7 +500,7 @@ $app->get('/monitors',
     
     return response()->json(new \App\Http\Models\MonitorList($ret,
                 new App\Http\Models\Links(
-                        env('APP_URL') . "/monitors/" . $user->id,
+                        env('APP_URL') . "/monitors",
                         "null",
                         "null"
                         )));
