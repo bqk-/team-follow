@@ -16,11 +16,11 @@ class MonitorList
 {
     public
             $teams,
-            $links;
+            $_links;
     
     public function __construct($teams, Links $links)
     {
         $this->teams = $teams;
-        $this->links = $links;
+        $this->_links = $links;
     }
 }

@@ -15,7 +15,7 @@ namespace App\Http\Models;
 class PastFixtures
 {
     public $games, $_links;
-    public function __construct($games, $links)
+    public function __construct($games, Links $links)
     {
         $this->games = $games;
         $this->_links = $links;
