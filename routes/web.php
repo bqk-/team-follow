@@ -53,6 +53,24 @@ $app->post('/user/login', function (Request $request) {
     $user = App\Database\User::where("username", $u)->first();
     if($user == null)
     {
+        return response()->json(false);
+    }
+    
+    return response()->json(password_verify($p, $user->password));
+});
+
+$app->post('/user/register', function (Request $request) {
+    $token = $request->header("token");
+    if(empty($token))
+    {
+        return response()->json(false);
+    }
+    
+    list($u, $p) = explode(":", base64_decode($token));
+    
+    $user = App\Database\User::where("username", $u)->first();
+    if($user == null)
+    {
         $newUser = new App\Database\User;
         $newUser->username = $u;
         $newUser->password = password_hash($p, PASSWORD_BCRYPT);
@@ -61,7 +79,7 @@ $app->post('/user/login', function (Request $request) {
         return response()->json(true);
     }
     
-    return response()->json(password_verify($p, $user->password));
+    return response()->json(false);
 });
 
 $app->get('/teams/search/{search:[a-zA-Z0-9]+}', function ($search = "") use ($app) {
