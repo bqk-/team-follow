@@ -49,19 +49,19 @@ $app->post('/user/login', function (Request $request) {
     }
     
     list($u, $p) = explode(":", base64_decode($token));
-    
+
     $user = App\Database\User::where("username", $u)->first();
     if($user == null)
     {
         return response()->json(false);
     }
-    
+
     if(password_verify($p, $user->password))
     {
         $user->date = date("Y-m-d H:i:s", time());
-        return true;
+        return response()->json(true);
     }
-    
+
     return response()->json(false);
 });
 
@@ -530,3 +530,23 @@ $app->get('/monitors',
                         "null"
                         )));
 }]);
+
+$app->get('/friends', 
+        ['middleware' => 'auth', 
+            'uses' => 'FriendsController@get'
+]);
+
+$app->get('/friends/add/{id:[0-9]+}', 
+        ['middleware' => 'auth', 
+            'uses' => 'FriendsController@add'
+]);
+
+$app->get('/friends/remove/{id:[0-9]+}', 
+        ['middleware' => 'auth', 
+            'uses' => 'FriendsController@remove'
+]);
+
+$app->get('/friends/accept/{id:[0-9]+}', 
+        ['middleware' => 'auth', 
+            'uses' => 'FriendsController@accept'
+]);
