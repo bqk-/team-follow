@@ -16,8 +16,13 @@ class Friend extends \Illuminate\Database\Eloquent\Model
 {
     public $timestamps = false;
     
-    public function friend()
+    public function user1()
     {
-        return $this->hasOne('App\Database\Friend');
-    } 
+        return $this->hasOne('App\Database\User', 'user_id');
+    }
+    
+    public function user2()
+    {
+        return $this->hasOne('App\Database\User', 'user_id_accept');
+    }
 }

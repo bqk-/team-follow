@@ -8,20 +8,19 @@
 namespace App\Http\Models;
 
 /**
- * Description of Friend
+ * Description of FriendSearch
  *
  * @author thibault
  */
-class Friend
+class FriendSearch
 {
-    public $id,
-            $name,
-            $status;
+    public
+            $results,
+            $_links;
     
-    public function __construct($id, $name, $status)
+    public function __construct($results, Links $links)
     {
-        $this->id = $id;
-        $this->name = $name;
-        $this->status = $status;
+        $this->results = $results;
+        $this->_links = $links;
     }
 }

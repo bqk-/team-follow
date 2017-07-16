@@ -8,20 +8,20 @@
 namespace App\Http\Models;
 
 /**
- * Description of Friend
+ * Description of User
  *
  * @author thibault
  */
-class Friend
+class User
 {
     public $id,
             $name,
-            $status;
+            $date;
     
-    public function __construct($id, $name, $status)
+    public function __construct($id, $name, $date)
     {
         $this->id = $id;
         $this->name = $name;
-        $this->status = $status;
+        $this->date = $date;
     }
 }

@@ -550,3 +550,8 @@ $app->get('/friends/accept/{id:[0-9]+}',
         ['middleware' => 'auth', 
             'uses' => 'FriendsController@accept'
 ]);
+
+$app->get('/friends/search/{id:[0-9]+}', 
+        ['middleware' => 'auth', 
+            'uses' => 'FriendsController@search'
+]);

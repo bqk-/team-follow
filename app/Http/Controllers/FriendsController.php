@@ -28,24 +28,27 @@ class FriendsController extends Controller
         
         $query = App\Database\Friend::where('user_id', $user->id)
             ->orWhere('user_id_accept', $user->id)
+                ->with('user1')
+                ->with('user2')
             ->get();
         
         $active = [];
         $pending = [];
         foreach ($query as $f)
         {
+            $friend = $f->user_id == $user->id ? $f->user2 : $f->user1;
             if($f->status == \App\Http\Models\FriendStatus::ACCEPTED)
             {
                 $active[] = new \App\Http\Models\Friend(
-                        $f->user_id == $user->id ? $f->user_id : $f->user_id_accept,
-                        $f->user_id == $user->id ? $f->user_id_accept : $f->user_id,
+                        $friend->id,
+                        $friend->username,
                         $f->status);
             }
             else
             {
                 $pending[] = new \App\Http\Models\Friend(
-                        $f->user_id == $user->id ? $f->user_id : $f->user_id_accept,
-                        $f->user_id == $user->id ? $f->user_id_accept : $f->user_id,
+                        $friend->id,
+                        $friend->username,
                         $f->status);
             }
         }
@@ -151,5 +154,34 @@ class FriendsController extends Controller
         $query->status = \App\Http\Models\FriendStatus::PENDING;
         
         return response()->json(true);
+    }
+    
+    public function search($search)
+    {
+        $user = Auth::user();
+        if($user == null)
+        {
+            return response()->json(false);
+        }
+        
+        $query = App\Database\User::
+            leftJoin('friends as f1', 'friends.user_id', '=', 'users.id')
+            ->leftJoin('friends as f2', 'friends.user_id_accept', '=', 'users.id')
+             ->where('username', 'LIKE', '%' . $search . '%')
+                ->whereNull('f1.id')
+                ->whereNull('f2.id')
+            ->orderBy('name', 'desc')->get();
+            
+        $ret = [];
+        foreach ($query as $u)
+        {
+            $ret[] = new \App\Http\Models\User($u->id, $u->username, $u->date);
+        }
+        
+        return response()->json(new \App\Http\Models\FriendSearch($ret,
+                new \App\Http\Models\Links(
+                        env('APP_URL') . "/friends/search/" + $search,
+                        null,
+                        null)));
     }
 }
