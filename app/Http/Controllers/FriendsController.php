@@ -16,7 +16,7 @@ class FriendsController extends Controller
 
     public function get()
     {
-        $user = Auth::user();
+        $user = \Auth::user();
         if($user == null)
         {
             return response()->json(new \App\Http\Models\FriendList(null, null,
@@ -26,7 +26,7 @@ class FriendsController extends Controller
                         null)));
         }
         
-        $query = App\Database\Friend::where('user_id', $user->id)
+        $query = \App\Database\Friend::where('user_id', $user->id)
             ->orWhere('user_id_accept', $user->id)
                 ->with('user1')
                 ->with('user2')
@@ -62,13 +62,13 @@ class FriendsController extends Controller
     
     public function add($id)
     {
-        $user = Auth::user();
+        $user = \Auth::user();
         if($user == null)
         {
             return response()->json(false);
         }
         
-        $query = App\Database\Friend::
+        $query = \App\Database\Friend::
             where(function ($query) use ($id) {
                 $query->where('user_id', $user->id)
                     ->orWhere('user_id_accept', $user->id);
@@ -95,13 +95,13 @@ class FriendsController extends Controller
     
     public function remove($id)
     {
-        $user = Auth::user();
+        $user = \Auth::user();
         if($user == null)
         {
             return response()->json(false);
         }
         
-        $query = App\Database\Friend::
+        $query = \App\Database\Friend::
             where(function ($query) use ($id) {
                 $query->where('user_id', $user->id)
                     ->orWhere('user_id_accept', $user->id);
@@ -124,13 +124,13 @@ class FriendsController extends Controller
     
     public function accept($id)
     {
-        $user = Auth::user();
+        $user = \Auth::user();
         if($user == null)
         {
             return response()->json(false);
         }
         
-        $query = App\Database\Friend::
+        $query = \App\Database\Friend::
             where(function ($query) use ($id) {
                 $query->where('user_id', $user->id)
                     ->orWhere('user_id_accept', $user->id);
@@ -158,13 +158,13 @@ class FriendsController extends Controller
     
     public function search($search)
     {
-        $user = Auth::user();
+        $user = \Auth::user();
         if($user == null)
         {
             return response()->json(false);
         }
         
-        $query = App\Database\User::
+        $query = \App\Database\User::
             leftJoin('friends as f1', 'friends.user_id', '=', 'users.id')
             ->leftJoin('friends as f2', 'friends.user_id_accept', '=', 'users.id')
              ->where('username', 'LIKE', '%' . $search . '%')
