@@ -86,7 +86,7 @@ $app->post('/user/register', function (Request $request) {
         return response()->json(true);
     }
     
-    return response()->json(false);
+    return response()->json("Username already exists.");
 });
 
 $app->get('/teams/search/{search:[a-zA-Z0-9]+}', function ($search = "") use ($app) {
@@ -551,7 +551,7 @@ $app->get('/friends/accept/{id:[0-9]+}',
             'uses' => 'FriendsController@accept'
 ]);
 
-$app->get('/friends/search/{id:[0-9]+}', 
+$app->get('/friends/search/{search}', 
         ['middleware' => 'auth', 
             'uses' => 'FriendsController@search'
 ]);
