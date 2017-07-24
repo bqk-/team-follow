@@ -170,7 +170,9 @@ class FriendsController extends Controller
              ->where('username', 'LIKE', '%' . $search . '%')
                 ->whereNull('f1.id')
                 ->whereNull('f2.id')
-            ->orderBy('username', 'desc')->get();
+            ->orderBy('username', 'desc')
+            ->select('users.id', 'users.username', 'users.date')    
+            ->get();
             
         $ret = [];
         foreach ($query as $u)
