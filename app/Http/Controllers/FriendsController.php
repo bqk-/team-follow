@@ -69,7 +69,7 @@ class FriendsController extends Controller
         }
         
         $query = \App\Database\Friend::
-            where(function ($query) use ($id) {
+            where(function ($query) use ($user) {
                 $query->where('user_id', $user->id)
                     ->orWhere('user_id_accept', $user->id);
             })
@@ -102,7 +102,7 @@ class FriendsController extends Controller
         }
         
         $query = \App\Database\Friend::
-            where(function ($query) use ($id) {
+            where(function ($query) use ($user) {
                 $query->where('user_id', $user->id)
                     ->orWhere('user_id_accept', $user->id);
             })
@@ -131,7 +131,7 @@ class FriendsController extends Controller
         }
         
         $query = \App\Database\Friend::
-            where(function ($query) use ($id) {
+            where(function ($query) use ($user) {
                 $query->where('user_id', $user->id)
                     ->orWhere('user_id_accept', $user->id);
             })
