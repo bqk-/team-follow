@@ -536,17 +536,17 @@ $app->get('/friends',
             'uses' => 'FriendsController@get'
 ]);
 
-$app->get('/friends/add/{id:[0-9]+}', 
+$app->post('/friends/add/{id:[0-9]+}', 
         ['middleware' => 'auth', 
             'uses' => 'FriendsController@add'
 ]);
 
-$app->get('/friends/remove/{id:[0-9]+}', 
+$app->post('/friends/remove/{id:[0-9]+}', 
         ['middleware' => 'auth', 
             'uses' => 'FriendsController@remove'
 ]);
 
-$app->get('/friends/accept/{id:[0-9]+}', 
+$app->post('/friends/accept/{id:[0-9]+}', 
         ['middleware' => 'auth', 
             'uses' => 'FriendsController@accept'
 ]);
