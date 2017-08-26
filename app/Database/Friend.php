@@ -18,11 +18,11 @@ class Friend extends \Illuminate\Database\Eloquent\Model
     
     public function user1()
     {
-        return $this->hasOne('App\Database\User', 'user_id');
+        return $this->hasOne('App\Database\User', 'id', 'user_id');
     }
     
     public function user2()
     {
-        return $this->hasOne('App\Database\User', 'user_id_accept');
+        return $this->hasOne('App\Database\User', 'id', 'user_id_accept');
     }
 }
