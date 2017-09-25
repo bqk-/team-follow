@@ -22,7 +22,7 @@ class Game
             $penaltiesHome,
             $penaltiesAway;
     
-    public function __construct($id, $date, $homeTeam, $awayTeam, $status, $competitionId, 
+    public function __construct($id, $date, Team $homeTeam, Team $awayTeam, $status, $competitionId, 
             $homeGoals, $awayGoals, $extraTimeHomeGoals, $extraTimeAwayGoals,
             $penaltiesHome, $penaltiesAway)
     {
