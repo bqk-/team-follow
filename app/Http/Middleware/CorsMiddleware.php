@@ -1,5 +1,7 @@
 <?php namespace App\Http\Middleware;
 
+use Closure;
+
 class CorsMiddleware {
     /**
      * Handle an incoming request.
