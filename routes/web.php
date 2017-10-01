@@ -181,7 +181,7 @@ $app->get('/monitors/fixtures/past/{page:[0-9]+}',
         return response()->json(null);
     }
     
-    $before = date('Y-m-d', strtotime('today'));
+    $before = date('Y-m-d', strtotime('-3 hours'));
     //$after = date('Y-m-d', strtotime('+1 week'));
     $monitors = \App\Database\Monitor::where('userId', $user->id)->select('teamId')->get();
     if($monitors->count() == 0)
@@ -196,7 +196,7 @@ $app->get('/monitors/fixtures/past/{page:[0-9]+}',
             ));
     }
     
-    $query = App\Database\Fixture::where('date', '<', $before)
+    $query = App\Database\Fixture::where('status', '=', 'FINISHED')
             //->where('date', '<=', $after)
             ->whereRaw('(homeTeamId in (' . $monitors->implode('teamId', ',') . ') or '
                     . 'awayTeamId in (' . $monitors->implode('teamId', ',') . '))')
@@ -274,7 +274,7 @@ $app->get('/monitors/fixtures/coming/{page:[0-9]+}',
         return response()->json(null);
     }
     
-    $before = date('Y-m-d', strtotime('today'));
+    $before = date('Y-m-d', strtotime('-3 hours'));
     //$after = date('Y-m-d', strtotime('+1 week'));
     $monitors = \App\Database\Monitor::where('userId', $user->id)->select('teamId')->get();
     if($monitors->count() == 0)
@@ -289,7 +289,8 @@ $app->get('/monitors/fixtures/coming/{page:[0-9]+}',
             ));
     }
     
-    $query = App\Database\Fixture::where('date', '>', $before)
+    $query = App\Database\Fixture::
+            where('status', '!=', 'FINISHED')
             //->where('date', '<=', $after)
             ->whereRaw('(homeTeamId in (' . $monitors->implode('teamId', ',') . ') or '
                     . 'awayTeamId in (' . $monitors->implode('teamId', ',') . '))')
