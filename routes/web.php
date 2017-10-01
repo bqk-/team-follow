@@ -181,7 +181,7 @@ $app->get('/monitors/fixtures/past/{page:[0-9]+}',
         return response()->json(null);
     }
     
-    $before = date('Y-m-d', strtotime('yesterday'));
+    $before = date('Y-m-d', strtotime('today'));
     //$after = date('Y-m-d', strtotime('+1 week'));
     $monitors = \App\Database\Monitor::where('userId', $user->id)->select('teamId')->get();
     if($monitors->count() == 0)
@@ -274,7 +274,7 @@ $app->get('/monitors/fixtures/coming/{page:[0-9]+}',
         return response()->json(null);
     }
     
-    $before = date('Y-m-d', strtotime('yesterday'));
+    $before = date('Y-m-d', strtotime('today'));
     //$after = date('Y-m-d', strtotime('+1 week'));
     $monitors = \App\Database\Monitor::where('userId', $user->id)->select('teamId')->get();
     if($monitors->count() == 0)
