@@ -48,6 +48,11 @@ class Monitor extends Command
                         ]
                     ]);
                 $response = json_decode($request->getBody());
+                if(!property_exists($response, 'fixtuer'))
+                {
+                    continue;
+                }
+                
                 $f = $response->fixture;
  
                 if(isset($f->result) && $this->hasChanged($t, $f))
