@@ -48,7 +48,7 @@ class Monitor extends Command
                         ]
                     ]);
                 $response = json_decode($request->getBody());
-                if(!property_exists($response, 'fixtuer'))
+                if(!property_exists($response, 'fixture'))
                 {
                     continue;
                 }
@@ -81,8 +81,8 @@ class Monitor extends Command
             }
         }
         catch (\GuzzleHttp\Exception\ClientException $e) {
-            sleep(60);
-            $this->handle();
+            //sleep(60);
+            //$this->handle();
         }
     }
     

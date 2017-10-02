@@ -29,8 +29,8 @@ class HarvestFixture extends Command
     {
         try
         {
-            $count = \App\Database\Monitor::count();
-            for($page = 0; $page < $count / 20; $page++)
+            $count = \App\Database\Monitor::select('teamId')->distinct()->count();
+            for($page = 0; $page < round($count / 20); $page++)
             {
                 $teams = \App\Database\Monitor::
                         select('teamId')->distinct()
@@ -38,7 +38,7 @@ class HarvestFixture extends Command
                 foreach ($teams as $t)  
                 {
                     $client = new \GuzzleHttp\Client();
-                    $request = $client->get('http://api.football-data.org/v1/teams/' . 
+                    $request = $client->get('thtp://api.football-data.org/v1/teams/' . 
                             $t->teamId . '/fixtures?timeFrame=n60',
                             [
                             'headers' => [
