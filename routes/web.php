@@ -150,7 +150,7 @@ $app->post('/monitors/new/{id:[0-9]+}', ['middleware' => 'auth', function ($id) 
 
 $app->delete('/monitors/delete/{teamId:[0-9]+}', ['middleware' => 'auth', function($teamId) use ($app){
     $user = Auth::user();
-    if($id == null || $user == null) 
+    if($id == null || $user == null)
     {
         return response()->json(false);
     }
@@ -504,32 +504,31 @@ $app->get('/team/{id:[0-9]+}', function ($id) use ($app) {
 });
 
 
-$app->get('/monitors', 
-        ['middleware' => 'auth', function() use ($app){
+$app->get('/monitors/{page:[0-9]+}', 
+        ['middleware' => 'auth', function($page) use ($app){
     $user = Auth::user();
-    if($user == null) 
-    {
-        $monitors = \App\Database\Monitor::all();
-    }
-    else
-    {
-        $monitors = App\Database\Monitor::where('userId', $user->id)->get();
-    }
+    
+    $query = App\Database\Monitor::where('userId', $user->id);
+            
+    $count = $query->count();
+    $monitors = $query->skip($page * PAGESIZE)->take(PAGESIZE)
+                ->get();
     
     $ret = array();
     foreach ($monitors as $m)
     {
         $t = App\Database\Team::find($m->teamId);
-        $ret[] = new \App\Http\Models\Monitor($m->id, new App\Http\Models\Team($t->id, $t->name, $t->code, $t->logo,
-                env('APP_URL') . "/team/" . $t->id));
+        $ret[] = new App\Http\Models\Team($t->id, $t->name, $t->code, $t->logo,
+                env('APP_URL') . "/team/" . $t->id);
     }
     
-    return response()->json(new \App\Http\Models\MonitorList($ret,
+    return response()->json(new \App\Http\Models\TeamList($ret,
                 new App\Http\Models\Links(
-                        env('APP_URL') . "/monitors",
-                        "null",
-                        "null"
-                        )));
+                        env('APP_URL') . "/monitors/" . $page,
+                    (($page + 1) * PAGESIZE < $count ? env('APP_URL') . "/monitors/" . ($page + 1) : "null"),
+                    ($page > 0 ? env('APP_URL') . "/monitors/" . ($page - 1) : "null") 
+                    )
+                ));
 }]);
 
 $app->get('/friends', 
