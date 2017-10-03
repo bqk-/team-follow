@@ -204,11 +204,7 @@ class FriendsController extends Controller
         }
         
         $query = \App\Database\User::
-            leftJoin('friends as f1', 'f1.user_id', '=', 'users.id')
-            ->leftJoin('friends as f2', 'f2.user_id_accept', '=', 'users.id')
-             ->where('username', 'LIKE', '%' . $search . '%')
-                ->whereNull('f1.id')
-                ->whereNull('f2.id')
+            where('username', 'LIKE', '%' . $search . '%')
             ->orderBy('username', 'desc')
             ->select('users.id', 'users.username', 'users.date')    
             ->get();
