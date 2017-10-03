@@ -531,7 +531,7 @@ $app->get('/monitors/{page:[0-9]+}',
                 ));
 }]);
 
-$app->get('/friends', 
+$app->get('/friends/{page:[0-9]+}', 
         ['middleware' => 'auth', 
             'uses' => 'FriendsController@get'
 ]);

@@ -14,7 +14,7 @@ class FriendsController extends Controller
         //
     }
 
-    public function get()
+    public function get($page)
     {
         $user = \Auth::user();
         if($user == null)
@@ -29,12 +29,15 @@ class FriendsController extends Controller
         $query = \App\Database\Friend::where('user_id', $user->id)
             ->orWhere('user_id_accept', $user->id)
                 ->with('user1')
-                ->with('user2')
-            ->get();
+                ->with('user2');
+        
+        $count = $query->count();
+        $friends = $query->skip($page * PAGESIZE)->take(PAGESIZE)
+                ->get();
         
         $active = [];
         $pending = [];
-        foreach ($query as $f)
+        foreach ($friends as $f)
         {
             $friend = $f->user_id == $user->id ? $f->user2 : $f->user1;
             if($f->status == \App\Http\Models\FriendStatus::ACCEPTED)
@@ -54,10 +57,12 @@ class FriendsController extends Controller
         }
         
         return response()->json(new \App\Http\Models\FriendList($pending, $active,
-                new \App\Http\Models\Links(
-                        env('APP_URL') . "/friends/",
-                        null,
-                        null)));
+                 new App\Http\Models\Links(
+                    env('APP_URL') . "/friends/" . $page,
+                    (($page + 1) * PAGESIZE < $count ? env('APP_URL') . "/friends/" . ($page + 1) : "null"),
+                    ($page > 0 ? env('APP_URL') . "/friends/" . ($page - 1) : "null") 
+                    )
+                ));
     }
     
     public function add($id)
