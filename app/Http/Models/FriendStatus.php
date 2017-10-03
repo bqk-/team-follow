@@ -16,4 +16,5 @@ class FriendStatus
 {
     const PENDING = 1;
     const ACCEPTED = 2;
+    const REFUSED = 3;
 }

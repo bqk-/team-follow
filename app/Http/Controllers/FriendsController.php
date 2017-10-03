@@ -156,6 +156,40 @@ class FriendsController extends Controller
         return response()->json(true);
     }
     
+    public function refuse($id)
+    {
+        $user = \Auth::user();
+        if($user == null)
+        {
+            return response()->json(false);
+        }
+        
+        $query = \App\Database\Friend::
+            where(function ($query) use ($user) {
+                $query->where('user_id', $user->id)
+                    ->orWhere('user_id_accept', $user->id);
+            })
+            ->where(function ($query) use ($id) {
+                $query->where('user_id', $id)
+                    ->orWhere('user_id_accept', $id);
+            })
+            ->first();
+            
+        if($query == null)
+        {
+            return response()->json(false);
+        }
+        
+        if($query->status == \App\Http\Models\FriendStatus::ACCEPTED)
+        {
+            return response()->json(false);
+        }
+        
+        $query->status = \App\Http\Models\FriendStatus::REFUSED;
+        
+        return response()->json(true);
+    }
+    
     public function search($search)
     {
         $user = \Auth::user();

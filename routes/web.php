@@ -551,6 +551,11 @@ $app->post('/friends/accept/{id:[0-9]+}',
             'uses' => 'FriendsController@accept'
 ]);
 
+$app->post('/friends/refuse/{id:[0-9]+}', 
+        ['middleware' => 'auth', 
+            'uses' => 'FriendsController@refuse'
+]);
+
 $app->get('/friends/search/{search}', 
         ['middleware' => 'auth', 
             'uses' => 'FriendsController@search'
