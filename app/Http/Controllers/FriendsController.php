@@ -190,7 +190,7 @@ class FriendsController extends Controller
             return response()->json(false);
         }
         
-        $query->status = \App\Http\Models\FriendStatus::REFUSED;
+        $query->delete();
         
         return response()->json(true);
     }
