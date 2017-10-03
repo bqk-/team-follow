@@ -221,7 +221,7 @@ class FriendsController extends Controller
         
         return response()->json(new \App\Http\Models\FriendSearch($ret,
                 new \App\Http\Models\Links(
-                        env('APP_URL') . "/friends/search/" + $search,
+                        env('APP_URL') . "/friends/search/" . $search,
                         null,
                         null)));
     }
