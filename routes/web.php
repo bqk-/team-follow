@@ -541,7 +541,7 @@ $app->post('/friends/add/{id:[0-9]+}',
             'uses' => 'FriendsController@add'
 ]);
 
-$app->post('/friends/remove/{id:[0-9]+}', 
+$app->delete('/friends/remove/{id:[0-9]+}', 
         ['middleware' => 'auth', 
             'uses' => 'FriendsController@remove'
 ]);
