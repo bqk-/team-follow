@@ -10,7 +10,7 @@ namespace App\Http\Models;
 class TeamDetails
 {
     public $id, $name, $code, $logo, $games,
-            $links;
+            $_links;
     
     public function __construct($id, $name, $code, $logo, $games,
             $links)
@@ -20,6 +20,6 @@ class TeamDetails
         $this->code = $code;
         $this->logo = $logo;
         $this->games = $games;
-        $this->links = $links;
+        $this->_links = $links;
     }
 }

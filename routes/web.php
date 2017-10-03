@@ -148,14 +148,14 @@ $app->post('/monitors/new/{id:[0-9]+}', ['middleware' => 'auth', function ($id) 
     return response()->json(true);
 }]);
 
-$app->delete('/monitors/delete/{teamId:[0-9]+}', ['middleware' => 'auth', function($teamId) use ($app){
+$app->delete('/monitors/delete/{id:[0-9]+}', ['middleware' => 'auth', function($id) use ($app){
     $user = Auth::user();
     if($id == null || $user == null)
     {
         return response()->json(false);
     }
     
-    $monitor = App\Database\Monitor::where('teamId', '=', $teamId)
+    $monitor = App\Database\Monitor::where('teamId', '=', $id)
         ->where('userId', $user->id)
         ->first();
     if($monitor == null)
