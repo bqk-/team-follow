@@ -276,7 +276,7 @@ class FriendsController extends Controller
         
         $query = \App\Database\User::
             where('username', 'LIKE', '%' . $search . '%')
-            -where('id', '!=', $user->id)
+            ->where('id', '!=', $user->id)
             ->orderBy('username', 'desc')
             ->select('users.id', 'users.username', 'users.date')    
             ->get();
