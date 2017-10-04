@@ -139,7 +139,7 @@ class FriendsController extends Controller
     public function add($id)
     {
         $user = \Auth::user();
-        if($user == null)
+        if($user == null || $user->id == $id)
         {
             return response()->json(false);
         }
@@ -276,6 +276,7 @@ class FriendsController extends Controller
         
         $query = \App\Database\User::
             where('username', 'LIKE', '%' . $search . '%')
+            -where('id', '!=', $user->id)
             ->orderBy('username', 'desc')
             ->select('users.id', 'users.username', 'users.date')    
             ->get();
