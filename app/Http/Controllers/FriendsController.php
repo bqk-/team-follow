@@ -21,7 +21,7 @@ class FriendsController extends Controller
         {
             return response()->json(new \App\Http\Models\FriendList(null, null,
                 new \App\Http\Models\Links(
-                        env('APP_URL') . "/friends/",
+                        env('APP_URL') . "/friends/pending/0",
                         "null",
                         "null")));
         }
@@ -47,8 +47,8 @@ class FriendsController extends Controller
         return response()->json(new \App\Http\Models\FriendList($users,
                  new \App\Http\Models\Links(
                     env('APP_URL') . "/friends/" . $page,
-                    (($page + 1) * PAGESIZE < $count ? env('APP_URL') . "/friends/" . ($page + 1) : "null"),
-                    ($page > 0 ? env('APP_URL') . "/friends/" . ($page - 1) : "null") 
+                    (($page + 1) * PAGESIZE < $count ? env('APP_URL') . "/friends/pending/" . ($page + 1) : "null"),
+                    ($page > 0 ? env('APP_URL') . "/friends/pending/" . ($page - 1) : "null") 
                     )
                 ));
     }
@@ -85,9 +85,9 @@ class FriendsController extends Controller
         
         return response()->json(new \App\Http\Models\FriendList($users,
                  new \App\Http\Models\Links(
-                    env('APP_URL') . "/friends/" . $page,
-                    (($page + 1) * PAGESIZE < $count ? env('APP_URL') . "/friends/" . ($page + 1) : "null"),
-                    ($page > 0 ? env('APP_URL') . "/friends/" . ($page - 1) : "null") 
+                    env('APP_URL') . "/friends/waiting/" . $page,
+                    (($page + 1) * PAGESIZE < $count ? env('APP_URL') . "/friends/waiting/" . ($page + 1) : "null"),
+                    ($page > 0 ? env('APP_URL') . "/friends/waiting/" . ($page - 1) : "null") 
                     )
                 ));
     }
@@ -99,7 +99,7 @@ class FriendsController extends Controller
         {
             return response()->json(new \App\Http\Models\FriendList(null, null,
                 new \App\Http\Models\Links(
-                        env('APP_URL') . "/friends/",
+                        env('APP_URL') . "/friends/active/0",
                         "null",
                         "null")));
         }
@@ -129,9 +129,9 @@ class FriendsController extends Controller
         
         return response()->json(new \App\Http\Models\FriendList($users,
                  new \App\Http\Models\Links(
-                    env('APP_URL') . "/friends/" . $page,
-                    (($page + 1) * PAGESIZE < $count ? env('APP_URL') . "/friends/" . ($page + 1) : "null"),
-                    ($page > 0 ? env('APP_URL') . "/friends/" . ($page - 1) : "null") 
+                    env('APP_URL') . "/friends/active/" . $page,
+                    (($page + 1) * PAGESIZE < $count ? env('APP_URL') . "/friends/active/" . ($page + 1) : "null"),
+                    ($page > 0 ? env('APP_URL') . "/friends/active/" . ($page - 1) : "null") 
                     )
                 ));
     }
