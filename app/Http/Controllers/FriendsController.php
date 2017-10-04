@@ -106,7 +106,7 @@ class FriendsController extends Controller
         
         $query = \App\Database\Friend::
                 where(function ($query) use ($user) {
-                    $query->where('user_idt', $user->id)
+                    $query->where('user_id', $user->id)
                         ->orWhere('user_id_accept', $user->id);
                 })
                 ->where('status', \App\Http\Models\FriendStatus::ACCEPTED)
@@ -120,7 +120,7 @@ class FriendsController extends Controller
         $users = [];
         foreach ($friends as $f)
         {
-            $friend = $f->user1;
+            $friend = $f->user_id == $user->id ? $f->user2 : $f->user1;
             $users[] = new \App\Http\Models\Friend(
                         $friend->id,
                         $friend->username,
