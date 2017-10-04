@@ -25,8 +25,8 @@ class FriendsController extends Controller
                         "null",
                         "null")));
         }
-        
-        $query = \App\Database\Friend::where('user_id', $user->id)
+
+        $query = \App\Database\Friend::where('user_id', 1)
             ->where('status', \App\Http\Models\FriendStatus::PENDING)
                 ->with('user2');
         
@@ -45,7 +45,7 @@ class FriendsController extends Controller
         }
         
         return response()->json(new \App\Http\Models\FriendList($users,
-                 new App\Http\Models\Links(
+                 new \App\Http\Models\Links(
                     env('APP_URL') . "/friends/" . $page,
                     (($page + 1) * PAGESIZE < $count ? env('APP_URL') . "/friends/" . ($page + 1) : "null"),
                     ($page > 0 ? env('APP_URL') . "/friends/" . ($page - 1) : "null") 
@@ -84,7 +84,7 @@ class FriendsController extends Controller
         }
         
         return response()->json(new \App\Http\Models\FriendList($users,
-                 new App\Http\Models\Links(
+                 new \App\Http\Models\Links(
                     env('APP_URL') . "/friends/" . $page,
                     (($page + 1) * PAGESIZE < $count ? env('APP_URL') . "/friends/" . ($page + 1) : "null"),
                     ($page > 0 ? env('APP_URL') . "/friends/" . ($page - 1) : "null") 
@@ -128,7 +128,7 @@ class FriendsController extends Controller
         }
         
         return response()->json(new \App\Http\Models\FriendList($users,
-                 new App\Http\Models\Links(
+                 new \App\Http\Models\Links(
                     env('APP_URL') . "/friends/" . $page,
                     (($page + 1) * PAGESIZE < $count ? env('APP_URL') . "/friends/" . ($page + 1) : "null"),
                     ($page > 0 ? env('APP_URL') . "/friends/" . ($page - 1) : "null") 
