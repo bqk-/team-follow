@@ -14,7 +14,7 @@ class FriendsController extends Controller
         //
     }
 
-    public function get($page)
+    public function getPending($page)
     {
         $user = \Auth::user();
         if($user == null)
@@ -22,12 +22,94 @@ class FriendsController extends Controller
             return response()->json(new \App\Http\Models\FriendList(null, null,
                 new \App\Http\Models\Links(
                         env('APP_URL') . "/friends/",
-                        null,
-                        null)));
+                        "null",
+                        "null")));
         }
         
         $query = \App\Database\Friend::where('user_id', $user->id)
-            ->orWhere('user_id_accept', $user->id)
+            ->where('status', \App\Http\Models\FriendStatus::PENDING)
+                ->with('user2');
+        
+        $count = $query->count();
+        $friends = $query->skip($page * PAGESIZE)->take(PAGESIZE)
+                ->get();
+        
+        $users = [];
+        foreach ($friends as $f)
+        {
+            $friend = $f->user2;
+            $users[] = new \App\Http\Models\Friend(
+                        $friend->id,
+                        $friend->username,
+                        $f->status);
+        }
+        
+        return response()->json(new \App\Http\Models\FriendList($users,
+                 new App\Http\Models\Links(
+                    env('APP_URL') . "/friends/" . $page,
+                    (($page + 1) * PAGESIZE < $count ? env('APP_URL') . "/friends/" . ($page + 1) : "null"),
+                    ($page > 0 ? env('APP_URL') . "/friends/" . ($page - 1) : "null") 
+                    )
+                ));
+    }
+    
+    public function getWaiting($page)
+    {
+        $user = \Auth::user();
+        if($user == null)
+        {
+            return response()->json(new \App\Http\Models\FriendList(null, null,
+                new \App\Http\Models\Links(
+                        env('APP_URL') . "/friends/",
+                        "null",
+                        "null")));
+        }
+        
+        $query = \App\Database\Friend::where('user_id_accept', $user->id)
+            ->where('status', \App\Http\Models\FriendStatus::PENDING)
+                ->with('user1');
+        
+        $count = $query->count();
+        $friends = $query->skip($page * PAGESIZE)->take(PAGESIZE)
+                ->get();
+        
+        $users = [];
+        foreach ($friends as $f)
+        {
+            $friend = $f->user1;
+            $users[] = new \App\Http\Models\Friend(
+                        $friend->id,
+                        $friend->username,
+                        $f->status);
+        }
+        
+        return response()->json(new \App\Http\Models\FriendList($users,
+                 new App\Http\Models\Links(
+                    env('APP_URL') . "/friends/" . $page,
+                    (($page + 1) * PAGESIZE < $count ? env('APP_URL') . "/friends/" . ($page + 1) : "null"),
+                    ($page > 0 ? env('APP_URL') . "/friends/" . ($page - 1) : "null") 
+                    )
+                ));
+    }
+    
+    public function getActive($page)
+    {
+        $user = \Auth::user();
+        if($user == null)
+        {
+            return response()->json(new \App\Http\Models\FriendList(null, null,
+                new \App\Http\Models\Links(
+                        env('APP_URL') . "/friends/",
+                        "null",
+                        "null")));
+        }
+        
+        $query = \App\Database\Friend::
+                where(function ($query) use ($user) {
+                    $query->where('user_idt', $user->id)
+                        ->orWhere('user_id_accept', $user->id);
+                })
+                ->where('status', \App\Http\Models\FriendStatus::ACCEPTED)
                 ->with('user1')
                 ->with('user2');
         
@@ -35,28 +117,17 @@ class FriendsController extends Controller
         $friends = $query->skip($page * PAGESIZE)->take(PAGESIZE)
                 ->get();
         
-        $active = [];
-        $pending = [];
+        $users = [];
         foreach ($friends as $f)
         {
-            $friend = $f->user_id == $user->id ? $f->user2 : $f->user1;
-            if($f->status == \App\Http\Models\FriendStatus::ACCEPTED)
-            {
-                $active[] = new \App\Http\Models\Friend(
+            $friend = $f->user1;
+            $users[] = new \App\Http\Models\Friend(
                         $friend->id,
                         $friend->username,
                         $f->status);
-            }
-            else
-            {
-                $pending[] = new \App\Http\Models\Friend(
-                        $friend->id,
-                        $friend->username,
-                        $f->status);
-            }
         }
         
-        return response()->json(new \App\Http\Models\FriendList($pending, $active,
+        return response()->json(new \App\Http\Models\FriendList($users,
                  new App\Http\Models\Links(
                     env('APP_URL') . "/friends/" . $page,
                     (($page + 1) * PAGESIZE < $count ? env('APP_URL') . "/friends/" . ($page + 1) : "null"),
@@ -218,7 +289,7 @@ class FriendsController extends Controller
         return response()->json(new \App\Http\Models\FriendSearch($ret,
                 new \App\Http\Models\Links(
                         env('APP_URL') . "/friends/search/" . $search,
-                        null,
-                        null)));
+                        "null",
+                        "null")));
     }
 }

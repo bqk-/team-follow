@@ -11,14 +11,12 @@ namespace App\Http\Models;
 class FriendList
 {
     public
-            $pending,
-            $active,
+            $results,
             $_links;
     
-    public function __construct($pending, $active, Links $links)
+    public function __construct($users, Links $links)
     {
-        $this->active = $active;
-        $this->pending = $pending;
+        $this->results = $users;
         $this->_links = $links;
     }
 }

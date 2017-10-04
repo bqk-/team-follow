@@ -531,9 +531,19 @@ $app->get('/monitors/{page:[0-9]+}',
                 ));
 }]);
 
-$app->get('/friends/{page:[0-9]+}', 
+$app->get('/friends/pending/{page:[0-9]+}', 
         ['middleware' => 'auth', 
-            'uses' => 'FriendsController@get'
+            'uses' => 'FriendsController@getPending'
+]);
+
+$app->get('/friends/waiting/{page:[0-9]+}', 
+        ['middleware' => 'auth', 
+            'uses' => 'FriendsController@getWaiting'
+]);
+
+$app->get('/friends/active/{page:[0-9]+}', 
+        ['middleware' => 'auth', 
+            'uses' => 'FriendsController@getActive'
 ]);
 
 $app->post('/friends/add/{id:[0-9]+}', 
