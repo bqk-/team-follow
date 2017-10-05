@@ -26,7 +26,7 @@ class FriendsController extends Controller
                         "null")));
         }
 
-        $query = \App\Database\Friend::where('user_id', 1)
+        $query = \App\Database\Friend::where('user_id', $user->id)
             ->where('status', \App\Http\Models\FriendStatus::PENDING)
                 ->with('user2');
         
@@ -64,7 +64,6 @@ class FriendsController extends Controller
                         "null",
                         "null")));
         }
-        
         $query = \App\Database\Friend::where('user_id_accept', $user->id)
             ->where('status', \App\Http\Models\FriendStatus::PENDING)
                 ->with('user1');
