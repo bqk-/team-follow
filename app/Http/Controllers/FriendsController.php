@@ -226,7 +226,8 @@ class FriendsController extends Controller
             return response()->json(false);
         }
         
-        $query->status = \App\Http\Models\FriendStatus::PENDING;
+        $query->status = \App\Http\Models\FriendStatus::ACCEPTED;
+        $query->save();
         
         return response()->json(true);
     }
