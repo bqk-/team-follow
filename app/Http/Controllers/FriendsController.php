@@ -276,15 +276,28 @@ class FriendsController extends Controller
         
         $query = \App\Database\User::
             where('username', 'LIKE', '%' . $search . '%')
-            ->where('id', '!=', $user->id)
+            ->where('users.id', '!=', $user->id)
+            ->leftJoin('friends as f1', function ($join) use ($user) {
+                    $join->on('users.id', '=', 'f1.user_id_accept')
+                     ->where('f1.user_id', '=', $user->id);
+                })
+            ->leftJoin('friends as f2', function ($join) use ($user) {
+                    $join->on('users.id', '=', 'f2.user_id')
+                     ->where('f2.user_id_accept', '=', $user->id);
+                })
             ->orderBy('username', 'desc')
-            ->select('users.id', 'users.username', 'users.date')    
+            ->select('users.id', 'users.username', 'users.date',
+                    'f1.status as f1s', 'f2.status as f2s')    
             ->get();
             
         $ret = [];
         foreach ($query as $u)
         {
-            $ret[] = new \App\Http\Models\User($u->id, $u->username, $u->date);
+            $ret[] = new \App\Http\Models\User(
+                    $u->id, 
+                    $u->username, 
+                    $u->date,
+                    $u->f1s == null ? $u->f2s : $u->f1s);
         }
         
         return response()->json(new \App\Http\Models\FriendSearch($ret,

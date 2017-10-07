@@ -16,12 +16,14 @@ class User
 {
     public $id,
             $name,
-            $date;
+            $date,
+            $friendStatus;
     
-    public function __construct($id, $name, $date)
+    public function __construct($id, $name, $date, $friendStatus)
     {
         $this->id = $id;
         $this->name = $name;
         $this->date = $date;
+        $this->friendStatus = $friendStatus;
     }
 }

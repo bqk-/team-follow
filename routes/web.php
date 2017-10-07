@@ -100,17 +100,37 @@ $app->get('/teams/search/{search:[a-zA-Z0-9]+}', function ($search = "") use ($a
                     )
             ));
     }
+    $user = Auth::user();
     
-    $teams = App\Database\Team::where('name', 'LIKE', '%' . $search . '%')
+    if($user != null)
+    {
+        $teams = App\Database\Team::where('name', 'LIKE', '%' . $search . '%')
+                ->leftJoin('monitors', function ($join) use ($user) {
+                    $join->on('teams.id', '=', 'monitors.teamId')
+                         ->where('monitors.userId', '=', $user->id);
+                })
+            ->orderBy('name', 'desc')
+            ->select('teams.*', 'monitors.id as mid')
+            ->get();
+    }
+    else
+    {
+        $teams = App\Database\Team::where('name', 'LIKE', '%' . $search . '%')
             ->orderBy('name', 'desc')->get();
+    }
+    
     $ret = array();
     foreach ($teams as $t)
     {
-        $ret[] = new App\Http\Models\Team($t->id, $t->name, $t->code, $t->logo,
+        $ret[] = new App\Http\Models\TeamSearch($t->id, 
+                $t->name, 
+                $t->code, 
+                $t->logo,
+                $user != null ? $t->mid > 0 : false,
                 env('APP_URL') . "/team/" . $t->id);
     }
   
-    return response()->json(new \App\Http\Models\TeamList($ret,
+    return response()->json(new \App\Http\Models\TeamSearchResult($ret,
             new \App\Http\Models\Links(
                     env('APP_URL') . "/teams/search/" . $search,
                     "null",
