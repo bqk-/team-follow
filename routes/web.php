@@ -441,33 +441,36 @@ $app->get('/monitors/fixtures/current', function () use ($app) {
             ));
 });
 
+$app->get('/team/{id:[0-9]+}/coming/{page:[0-9]+}', function ($id,
+        $page) use ($app) {
+    if($page == null)
+    {
+        return response()->json(null);
+    }
 
-$app->get('/team/{id:[0-9]+}', function ($id) use ($app) {
     if($id == null)
     {
         return response()->json(null);
     }
-    
+
     $team = App\Database\Team::find($id);
     if($team == null)
     {
         return response()->json(null);
     }
     
-    $before = date('Y-m-d', time() - (30 * 3600 * 24));
-    $after = date('Y-m-d', time() + (60 * 3600 * 24));
+    $coming = App\Database\Fixture::
+            where('status', '!=', 'FINISHED')
+            //->where('date', '<=', $after)
+            ->whereRaw('(homeTeamId =' . $id . ' or '
+                    . 'awayTeamId =' . $id . ')')
+            ->orderBy('date', 'asc');
     
-    $fixtures = App\Database\Fixture::where('date', '>', $before)
-            ->where('date', '<', $after)
-            ->where(function ($query) use ($id) {
-                $query->where('homeTeamId', $id)
-                    ->orWhere('awayTeamId', $id);
-            })->orderBy('date', 'desc')
-            ->get();
-    $ret = array();
     $cacheTeams = array();
-    $cacheTeams[$team->id] = $team;
-    foreach ($fixtures as $f)
+    $count = $coming->count();
+    $fixtures2 = $coming->skip($page * PAGESIZE)->take(PAGESIZE)->get();
+    $retComing = array();
+    foreach ($fixtures2 as $f)
     {
         if(!isset($cacheTeams[$f->homeTeamId]))
         {
@@ -509,12 +512,118 @@ $app->get('/team/{id:[0-9]+}', function ($id) use ($app) {
                 $f->penaltiesAway);
         
         
-        $ret[] = $fixture;
+        $retComing[] = $fixture;
     }
-  
+    
+    return response()->json(new \App\Http\Models\ComingFixtures(
+            $retComing,
+            new \App\Http\Models\Links(
+                    env('APP_URL') . "/team/".$id."/coming/" . $page,
+                    (($page + 1) * PAGESIZE < $count ? env('APP_URL') . "/team/".$id."/coming/" . ($page + 1) : "null"),
+                    ($page > 0 ? env('APP_URL') . "/team/".$id."/coming/" . ($page - 1) : "null") 
+                    )
+            ));
+});
+
+$app->get('/team/{id:[0-9]+}/past/{page:[0-9]+}', function ($id,
+        $page) use ($app) {
+    if($page == null)
+    {
+        return response()->json(null);
+    }
+
+    if($id == null)
+    {
+        return response()->json(null);
+    }
+
+    $team = App\Database\Team::find($id);
+    if($team == null)
+    {
+        return response()->json(null);
+    }
+    
+    $past = App\Database\Fixture::
+            where('status', '=', 'FINISHED')
+            //->where('date', '<=', $after)
+            ->whereRaw('(homeTeamId =' . $id . ' or '
+                    . 'awayTeamId =' . $id . ')')
+            ->orderBy('date', 'desc');
+    
+    $cacheTeams = array();
+    $count = $past->count();
+    $fixtures2 = $past->skip($page * PAGESIZE)->take(PAGESIZE)->get();
+    $retPast = array();
+    foreach ($fixtures2 as $f)
+    {
+        if(!isset($cacheTeams[$f->homeTeamId]))
+        {
+            $t = App\Database\Team::find($f->homeTeamId);
+            if($t == null)
+            {
+                continue;
+            }
+            
+            $cacheTeams[$t->id] = $t;
+        }
+        
+        if(!isset($cacheTeams[$f->awayTeamId]))
+        {
+            $t = App\Database\Team::find($f->awayTeamId);
+            if($t == null)
+            {
+                continue;
+            }
+            
+            $cacheTeams[$t->id] = $t;
+        }
+        
+        $home = $cacheTeams[$f->homeTeamId];
+        $away = $cacheTeams[$f->awayTeamId];
+        
+        $fixture = new App\Http\Models\Game($f->id, $f->date,
+                new \App\Http\Models\Team($home->id, $home->name, $home->code, $home->logo,
+                        env('APP_URL') . "/team/" . $home->id),
+                new \App\Http\Models\Team($away->id, $away->name, $away->code, $away->logo,
+                        env('APP_URL') . "/team/" . $away->id),
+                $f->status,
+                $f->competitionId,
+                $f->homeGoals,
+                $f->awayGoals,
+                $f->extraTimeHomeGoals,
+                $f->extraTimeAwayGoals,
+                $f->penaltiesHome,
+                $f->penaltiesAway);
+        
+        
+        $retPast[] = $fixture;
+    }
+    
+    return response()->json(new \App\Http\Models\ComingFixtures(
+            $retPast,
+            new \App\Http\Models\Links(
+                    env('APP_URL') . "/team/".$id."/past/" . $page,
+                    (($page + 1) * PAGESIZE < $count ? env('APP_URL') . "/team/".$id."/past/" . ($page + 1) : "null"),
+                    ($page > 0 ? env('APP_URL') . "/team/".$id."/past/" . ($page - 1) : "null") 
+                    )
+            ));
+});
+
+
+$app->get('/team/{id:[0-9]+}', function ($id) use ($app) {
+    if($id == null)
+    {
+        return response()->json(null);
+    }
+    
+    $team = App\Database\Team::find($id);
+    if($team == null)
+    {
+        return response()->json(null);
+    }
+    
     return response()->json(new \App\Http\Models\TeamDetails($team->id, $team->name, 
             $team->code, $team->logo,
-            $ret,
             new \App\Http\Models\Links(
                     env('APP_URL') . "/team/" . $id,
                     "null",
@@ -522,8 +631,7 @@ $app->get('/team/{id:[0-9]+}', function ($id) use ($app) {
                     )
             ));
 });
-
-
+ 
 $app->get('/monitors/{page:[0-9]+}', 
         ['middleware' => 'auth', function($page) use ($app){
     $user = Auth::user();
