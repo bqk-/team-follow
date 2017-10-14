@@ -28,7 +28,12 @@ class Monitor extends Command
     public function handle()
     {
         $monitors = \App\Database\Monitor::where('userId', 1)
-                            ->select('teamId')->get()->toArray();
+                            ->select('teamId')->get();
+        $monitorsArray = array();
+        foreach ($monitors as $m)
+        {
+            $monitorsArray[] = $m->teamId;
+        }
         
         try
         {
@@ -84,7 +89,8 @@ class Monitor extends Command
                     $ida = substr($f->_links->awayTeam->href, 
                             strrpos($f->_links->awayTeam->href, '/') + 1, 
                             strlen($f->_links->awayTeam->href) - 1);
-                    if(in_array($idh, $monitors) || in_array($ida, $monitors))
+
+                    if(in_array($idh, $monitorsArray) || in_array($ida, $monitorsArray))
                     {
                         $this->sendNotification($notification);
                     }
