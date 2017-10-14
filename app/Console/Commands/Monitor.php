@@ -27,6 +27,9 @@ class Monitor extends Command
      */
     public function handle()
     {
+        $monitors = \App\Database\Monitor::where('userId', 1)
+                            ->select('teamId')->get();
+        
         try
         {
             date_default_timezone_set("UTC"); 
@@ -74,7 +77,18 @@ class Monitor extends Command
                     
                     $notification = 'Game update: ' . $f->homeTeamName .' ' . $f->result->goalsHomeTeam .
                             ' vs ' . $f->result->goalsAwayTeam . ' ' . $f->awayTeamName . ' / ' . $t->status .  PHP_EOL;
-                    $this->sendNotification($notification);
+                    
+                    $idh = substr($f->_links->homeTeam->href, 
+                            strrpos($f->_links->homeTeam->href, '/') + 1, 
+                            strlen($f->_links->homeTeam->href) - 1);
+                    $ida = substr($f->_links->awayTeam->href, 
+                            strrpos($f->_links->awayTeam->href, '/') + 1, 
+                            strlen($f->_links->awayTeam->href) - 1);
+                    if(in_array($idh, $monitors) || in_array($ida, $monitors))
+                    {
+                        $this->sendNotification($notification);
+                    }
+                    
                     echo $notification;
                     $t->save();
                 }
