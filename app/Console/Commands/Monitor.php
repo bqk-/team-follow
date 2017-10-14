@@ -28,7 +28,7 @@ class Monitor extends Command
     public function handle()
     {
         $monitors = \App\Database\Monitor::where('userId', 1)
-                            ->select('teamId')->get();
+                            ->select('teamId')->get()->toArray();
         
         try
         {
