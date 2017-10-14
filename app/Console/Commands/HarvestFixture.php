@@ -27,69 +27,54 @@ class HarvestFixture extends Command
      */
     public function handle()
     {
-        try
+        $start = time() - (7 * 24 * 60 * 60);
+        $end = time() + (7 * 24 * 60 * 60 * 8);
+        $current = $start;
+        
+        while($current < $end)
         {
-            $count = \App\Database\Monitor::select('teamId')->distinct()->count();
-            for($page = 0; $page < round($count / 20); $page++)
+            $current = $this->getPage($current);
+        }
+    }
+    
+    private function getPage($unixStamp)
+    {
+        $start = date('Y-m-d', $unixStamp);
+        $end = date('Y-m-d', $unixStamp + (7 * 24 * 60 * 60));
+        try 
+        {
+            $client = new \GuzzleHttp\Client();
+            $request = $client->get('http://api.football-data.org/v1/fixtures'
+                    . '?timeFrameStart=' . $start
+                    . '&timeFrameEnd=' . $end,
+                [
+                'headers' => [
+                    'User-Agent'  => 'testing/1.0',
+                    'Accept'      => 'application/json',
+                    'X-Auth-Token'=> env('APIKEY')
+                ]
+            ]);
+            
+            $response = json_decode($request->getBody());
+            foreach ($response->fixtures as $f)
             {
-                $teams = \App\Database\Monitor::
-                        select('teamId')->distinct()
-                        ->skip($page * 20)->take(20)->get();
-                foreach ($teams as $t)  
+                if(($ff = $this->getFixture($f->_links->self->href)) == null)
                 {
-                    $client = new \GuzzleHttp\Client();
-                    $request = $client->get('thtp://api.football-data.org/v1/teams/' . 
-                            $t->teamId . '/fixtures?timeFrame=n60',
-                            [
-                            'headers' => [
-                                'User-Agent'  => 'testing/1.0',
-                                'Accept'      => 'application/json',
-                                'X-Auth-Token'=> env('APIKEY')
-                            ]
-                        ]);
-                    
-                    $request2 = $client->get('http://api.football-data.org/v1/teams/' . 
-                            $t->teamId . '/fixtures?timeFrame=p30',
-                            [
-                            'headers' => [
-                                'User-Agent'  => 'testing/1.0',
-                                'Accept'      => 'application/json',
-                                'X-Auth-Token'=> env('APIKEY')
-                            ]
-                        ]);
-                    
-                    $response = json_decode($request->getBody());
-                    foreach ($response->fixtures as $f)
-                    {
-                        if(($ff = $this->getFixture($f->_links->self->href)) == null)
-                        {
-                            $this->registerFixture($f);
-                        }   
-                        else
-                        {
-                            $this->updateFixture($f, $ff);
-                        }
-                    }
-                    
-                    $response2 = json_decode($request2->getBody());
-                    foreach ($response2->fixtures as $f)
-                    {
-                        if(($ff = $this->getFixture($f->_links->self->href)) == null)
-                        {
-                            $this->registerFixture($f);
-                        }   
-                        else
-                        {
-                            $this->updateFixture($f, $ff);
-                        }
-                    }
+                    $this->registerFixture($f);
+                }   
+                else
+                {
+                    $this->updateFixture($f, $ff);
                 }
             }
         }
         catch (\GuzzleHttp\Exception\ClientException $e) {
+            echo 'Exception, retrying in 65 secondes..' . PHP_EOL;
             sleep(65);
-            $this->handle();
+            return $unixStamp;
         }
+        
+        return $unixStamp + (7 * 24 * 60 * 60);
     }
     
     private function getFixture($href)
@@ -111,7 +96,7 @@ class HarvestFixture extends Command
         $this->updateFixture($f, $t);
     }
     
-    private function updateFixture($f, $t)
+    private function updateFixture($f, \App\Database\Fixture $t)
     {
         $href = $f->_links->homeTeam->href;
         $id = substr($href, strrpos($href, '/') + 1, strlen($href) - 1);
@@ -154,7 +139,8 @@ class HarvestFixture extends Command
                 $t->penaltiesAway = null;
             }
         }
-        
+        echo 'Updated ' . $f->homeTeamName .
+                ' - ' . $f->awayTeamName . PHP_EOL;
         $t->save();
     }
 }

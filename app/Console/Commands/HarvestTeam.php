@@ -39,18 +39,29 @@ class HarvestTeam extends Command
                     ]
                 ]);
             $response = json_decode($request->getBody());
-
+            $done = [];
             foreach ($response->fixtures as $f)
             {
-                if(!$this->existsTeam($f->_links->homeTeam->href))
+                if(($t = $this->getTeam($f->_links->homeTeam->href)) == null)
                 {
                     $this->registerTeam($f->_links->homeTeam->href);
                 }
+                else
+                {
+                    $this->updateTeam($t);
+                }
 
-                if(!$this->existsTeam($f->_links->awayTeam->href))
+                if(($t = $this->getTeam($f->_links->awayTeam->href)) == null)
                 {
                     $this->registerTeam($f->_links->awayTeam->href);
-                }            
+                }
+                else
+                {
+                    $this->updateTeam($t);
+                }      
+                
+                $done[] = $f->_links->homeTeam->href;
+                $done[] = $f->_links->awayTeam->href;
             }
         }
         catch (\GuzzleHttp\Exception\ClientException $e) {
@@ -59,11 +70,11 @@ class HarvestTeam extends Command
         }
     }
     
-    private function existsTeam($href)
+    private function getTeam($href)
     {
         $id = substr($href, strrpos($href, '/') + 1, strlen($href) - 1);
         $t = \App\Database\Team::find($id);
-        return $t != null;
+        return $t;
     }
     
     private function registerTeam($href)
@@ -89,5 +100,10 @@ class HarvestTeam extends Command
         $t->code = $team->code;
         $t->logo = $team->crestUrl;
         $t->save();
+    }
+    
+    private function updateTeam($href)
+    {
+        //
     }
 }
