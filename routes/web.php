@@ -84,7 +84,11 @@ $app->post('/user/register', function (Request $request) {
         return response()->json("Username is too long.", 400);
     }
     
-    if(!preg_match("#^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$#", $p))
+    $uppercase = preg_match('@[A-Z]@', $password);
+    $lowercase = preg_match('@[a-z]@', $password);
+    $number    = preg_match('@[0-9]@', $password);
+
+    if(!$uppercase || !$lowercase || !$number || strlen($password) < 8) 
     {
         return response()->json("Password is too weak.", 400);
     }
