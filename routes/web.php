@@ -69,12 +69,28 @@ $app->post('/user/register', function (Request $request) {
     $token = $request->header("token");
     if(empty($token))
     {
-        return response()->json(false);
+        return response()->json("No token provided", 400);
     }
     
     list($u, $p) = explode(":", base64_decode($token));
     
+    if(strlen($u) < 4)
+    {
+        return response()->json("Username is too short.", 400);
+    }
+    
+    if(strlen($u) > 30)
+    {
+        return response()->json("Username is too long.", 400);
+    }
+    
+    if(!preg_match("^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$", $p))
+    {
+        return response()->json("Password is too weak.", 400);
+    }
+    
     $user = App\Database\User::where("username", $u)->first();
+    
     if($user == null)
     {
         $newUser = new App\Database\User;
@@ -83,10 +99,10 @@ $app->post('/user/register', function (Request $request) {
         $newUser->date = date("Y-m-d H:i:s", time());
         $newUser->save();
         
-        return response()->json(true);
+        return response()->json("Success");
     }
     
-    return response()->json("Username already exists.");
+    return response()->json("Username already exists.", 400);
 });
 
 $app->get('/teams/search/{search:[a-zA-Z0-9]+}', function ($search = "") use ($app) {
